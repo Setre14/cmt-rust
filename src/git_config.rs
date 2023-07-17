@@ -1,10 +1,9 @@
-use std::process::Command;
 use std::path::Path;
 use std::fs;
 
 use crate::config::app;
 use crate::config::base;
-
+use crate::util::exec;
 
 pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, force: bool) {
     let mut app_conf = app::get_conf();
@@ -32,22 +31,10 @@ pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, force:
         }
     }
 
-    Command::new("git")
-        .arg("clone")
-        .arg(url)
-        .arg(git_config_dir.clone())
-        // .current_dir(git_config_dir)
-        .status()
-        .expect("Failed to clone");
+    exec::status("git", ["clone", url, &git_config_dir]);
 
-    Command::new("git")
-        .arg("checkout")
-        .arg("-b")
-        .arg(git_branch.clone())
-        .current_dir(git_config_dir.clone())
-        .status()
-        .expect("Failed to checkout branch");
-
+    exec::status_in_dir("git", ["checkout", "-b", &git_branch], &git_config_dir);
+    
     app_conf.git_clone_url = url.clone();
     app_conf.git_config_dir = git_config_dir.clone();
     app_conf.git_branch = git_branch.clone();

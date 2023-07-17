@@ -1,5 +1,6 @@
 mod config;
 mod git_config;
+mod util;
 
 use clap::{Parser, Subcommand};
 
