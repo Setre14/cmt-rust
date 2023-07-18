@@ -3,15 +3,15 @@ use std::ffi::OsStr;
 use std::path::Path;
 use std::env;
 
-pub fn status<I, S>(program: S, args: I)
+pub fn status<I, S>(program: S, args: I) -> bool
 where
     I: IntoIterator<Item = S>,
     S: AsRef<OsStr>,
 {
-    status_in_dir(program, args, env::current_dir().unwrap())
+    return status_in_dir(program, args, env::current_dir().unwrap())
 }
 
-pub fn status_in_dir<I, S, P>(program: S, args: I, current_dir: P)
+pub fn status_in_dir<I, S, P>(program: S, args: I, current_dir: P) -> bool
 where
     I: IntoIterator<Item = S>,
     S: AsRef<OsStr>,
@@ -20,7 +20,8 @@ where
     let status = Command::new(program)
         .args(args)
         .current_dir(current_dir)
-        .status();
+        .status()
+        .unwrap();
 
-    assert!(status.is_ok());
+    return status.success();
 }

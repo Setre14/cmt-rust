@@ -1,20 +1,23 @@
 mod config;
 mod git_config;
 mod util;
+mod pkgm;
 
 use clap::{Parser, Subcommand};
 
 use config::base;
+use pkgm::pacman;
+use pkgm::pacman::Pacman;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: Option<Command>,
 }
 
 #[derive(Subcommand)]
-enum Commands {
+enum Command {
     Init {
         url: String,
 
@@ -33,26 +36,28 @@ enum Commands {
 
     Env {},
 
-    Dnf {},
+    Pacman {
+        #[command(subcommand)]
+        command: pacman::Command,
+    },
 }
 
 fn main() {
     let cli = Cli::parse();
     
     match &cli.command {
-        Some(Commands::Init { url, dest, branch, force }) => {
+        Some(Command::Init { url, dest, branch, force }) => {
             git_config::init(url, dest, branch, *force);
         },
-        Some(Commands::Config {}) => {
+        Some(Command::Config {}) => {
             println!("config");
         },
-        Some(Commands::Env {}) => {
+        Some(Command::Env {}) => {
             println!("env");
         },
-        Some(Commands::Dnf {}) => {
-            println!("dnf");
+        Some(Command::Pacman {command}) => {
+            Pacman::handle_command(command)
         },
-
         None => {}
     }
 }
