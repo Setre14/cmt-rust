@@ -1,3 +1,7 @@
+extern crate clap;
+extern crate dirs;
+extern crate serde;
+
 mod config;
 mod git_config;
 mod util;
