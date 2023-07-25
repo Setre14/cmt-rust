@@ -34,21 +34,12 @@ impl base::ConfigReader for PkgmConfig {
 
 impl PkgmConfig {
     pub fn add_package(&mut self, package: &String) {
-        if !self.packages.contains(package) {
-            self.packages.push(package.clone().to_string());
-        }
-        self.packages.sort();
-
+        base::add_to_list(&mut self.packages, package);
         base::save_conf(self);
     }
 
     pub fn remove_package(&mut self, package: &String) {
-        if self.packages.contains(package) {
-            let index = self.packages.iter().position(|x| *x == package.to_string()).unwrap();
-            self.packages.remove(index);
-        }
-        self.packages.sort();
-    
+        base::remove_from_list(&mut self.packages, package);
         base::save_conf(self);
     }
 }

@@ -1,4 +1,5 @@
 // use crate::util::exec;
+use crate::config::env;
 
 use clap::{Subcommand};
 
@@ -39,11 +40,30 @@ impl Env {
     }
 
     pub fn add(path: &String) {
+        let mut conf = env::get_conf();
+
+        println!("{}", path);
+
+        conf.add_file(&path);
+
+
+        println!("{:#?}", conf);
     }
+
     pub fn apply() {
     }
+
     pub fn remove(path: &String) {
+        let mut conf = env::get_conf();
+
+        println!("{}", path);
+
+        conf.remove_file(&path);
+
+
+        println!("{:#?}", conf);
     }
+
     pub fn sync() {
     }
 }

@@ -30,24 +30,25 @@ impl base::ConfigReader for EnvConfig {
 }
 
 impl EnvConfig {
-    // pub fn add_package(&mut self, package: &String) {
-    //     if !self.packages.contains(package) {
-    //         self.packages.push(package.clone().to_string());
-    //     }
-    //     self.packages.sort();
+    pub fn add_file(&mut self, file: &String) {
+        base::add_to_list(&mut self.files, file);
+        base::save_conf(self);
+    }
 
-    //     base::save_conf(self);
-    // }
+    pub fn remove_file(&mut self, file: &String) {
+        base::remove_from_list(&mut self.files, file);
+        base::save_conf(self);
+    }
 
-    // pub fn remove_package(&mut self, package: &String) {
-    //     if self.packages.contains(package) {
-    //         let index = self.packages.iter().position(|x| *x == package.to_string()).unwrap();
-    //         self.packages.remove(index);
-    //     }
-    //     self.packages.sort();
-    
-    //     base::save_conf(self);
-    // }
+    pub fn add_folder(&mut self, folder: &String) {
+        base::add_to_list(&mut self.folders, folder);
+        base::save_conf(self);
+    }
+
+    pub fn remove_folder(&mut self, folder: &String) {
+        base::remove_from_list(&mut self.folders, folder);
+        base::save_conf(self);
+    }
 }
 
 pub fn get_conf() -> EnvConfig {

@@ -47,3 +47,18 @@ pub fn save_conf<T: Serialize + ConfigReader>(conf: &T) {
 
     serde_json::to_writer_pretty(&file, conf).expect("Failed to write conf");
 }
+
+pub fn add_to_list(list: &mut Vec<String>, item: &String) {
+    if !list.contains(item) {
+        list.push(item.clone().to_string());
+    }
+    list.sort();
+}
+
+pub fn remove_from_list(list: &mut Vec<String>, item: &String) {
+    if list.contains(item) {
+        let index = list.iter().position(|x| *x == item.to_string()).unwrap();
+        list.remove(index);
+    }
+    list.sort();
+}
