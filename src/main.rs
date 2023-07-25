@@ -6,10 +6,13 @@ mod config;
 mod git_config;
 mod util;
 mod pkgm;
+mod env;
 
 use clap::{Parser, Subcommand};
 
 use config::base;
+// use env;
+use env::Env;
 use pkgm::dnf;
 use pkgm::dnf::Dnf;
 use pkgm::pacman;
@@ -40,7 +43,10 @@ enum Command {
 
     Config {},
 
-    Env {},
+    Env {
+        #[command(subcommand)]
+        command: env::Command,
+    },
 
     Dnf {
         #[command(subcommand)]
@@ -63,8 +69,8 @@ fn main() {
         Some(Command::Config {}) => {
             println!("config");
         },
-        Some(Command::Env {}) => {
-            println!("env");
+        Some(Command::Env {command}) => {
+            Env::handle_command(command)
         },
         Some(Command::Pacman {command}) => {
             Pacman::handle_command(command)
