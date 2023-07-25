@@ -41,7 +41,10 @@ enum Command {
 
     },
 
-    Config {},
+    Config {
+        #[command(subcommand)]
+        command: git_config::Command,
+    },
 
     Env {
         #[command(subcommand)]
@@ -66,8 +69,8 @@ fn main() {
         Some(Command::Init { url, dest, branch, force }) => {
             git_config::init(url, dest, branch, *force);
         },
-        Some(Command::Config {}) => {
-            println!("config");
+        Some(Command::Config {command}) => {
+            git_config::handle_command(command)
         },
         Some(Command::Env {command}) => {
             Env::handle_command(command)

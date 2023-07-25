@@ -5,12 +5,26 @@ use std::fs;
 use crate::base;
 use crate::config::app;
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct EnvConfig {
+    pub user_home: String,
+    pub files_path: String,
+    pub folders_path: String,
     pub files: Vec<String>,
     pub folders: Vec<String>,
 }
 
+impl Default for EnvConfig {
+    fn default() -> Self { 
+        EnvConfig {
+            user_home: "user-home".to_string(),
+            files_path: "files".to_string(),
+            folders_path: "folders".to_string(),
+            files: Vec::new(),
+            folders: Vec::new(),
+        }
+    }
+}
 
 impl base::ConfigReader for EnvConfig {
     fn get_conf_name(&self) -> String {

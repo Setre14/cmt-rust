@@ -1,9 +1,43 @@
 use std::path::Path;
 use std::fs;
+use clap::{Subcommand};
 
 use crate::config::app;
 use crate::config::base;
 use crate::util::exec;
+
+#[derive(Subcommand)]
+pub enum Command {
+    Init {
+        url: String,
+
+        #[arg(short, long)]
+        dest: Option<String>,
+
+        #[arg(short, long)]
+        branch: Option<String>,
+
+        #[arg(short, long)]
+        force: bool,
+
+    },
+    Code {},
+    Nvim {},
+}
+
+pub fn handle_command(command: &Command) {
+    match command {
+        Command::Init { url, dest, branch, force } => {
+            init(url, dest, branch, *force);
+        },
+        Command::Code {} => {
+            open_code();
+        },
+        Command::Nvim {} => {
+            open_nvim();
+        }
+    }
+}
 
 pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, force: bool) {
     let mut app_conf = app::get_conf();
@@ -40,6 +74,21 @@ pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, force:
     app_conf.git_branch = git_branch.clone();
 
     base::save_conf(&app_conf);
+}
+
+pub fn open_code() {
+    let app_conf = app::get_conf();
+    let git_config_dir = app_conf.git_config_dir;
+
+    exec::status("code", [git_config_dir.as_str()]);
+}
+
+
+pub fn open_nvim() {
+    let app_conf = app::get_conf();
+    let git_config_dir = app_conf.git_config_dir;
+
+    exec::status("nvim", [git_config_dir.as_str()]);
 }
 
 // require 'thor'
