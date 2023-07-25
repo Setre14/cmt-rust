@@ -10,6 +10,8 @@ mod pkgm;
 use clap::{Parser, Subcommand};
 
 use config::base;
+use pkgm::dnf;
+use pkgm::dnf::Dnf;
 use pkgm::pacman;
 use pkgm::pacman::Pacman;
 
@@ -40,6 +42,11 @@ enum Command {
 
     Env {},
 
+    Dnf {
+        #[command(subcommand)]
+        command: dnf::Command,
+    },
+
     Pacman {
         #[command(subcommand)]
         command: pacman::Command,
@@ -61,6 +68,9 @@ fn main() {
         },
         Some(Command::Pacman {command}) => {
             Pacman::handle_command(command)
+        },
+        Some(Command::Dnf {command}) => {
+            Dnf::handle_command(command)
         },
         None => {}
     }
