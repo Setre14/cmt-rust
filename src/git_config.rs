@@ -26,6 +26,13 @@ pub enum Command {
         force: bool,
     },
 
+    /// Commit and push all changes in the git config
+    Update {
+        /// Message for the git commit
+        #[arg(short, long)]
+        message: Option<String>,
+    },
+
     /// Open git repo in VS Code
     Code {},
     /// Open git repo in NVim
@@ -36,6 +43,9 @@ pub fn handle_command(command: &Command) {
     match command {
         Command::Init { url, dest, branch, force } => {
             init(url, dest, branch, *force);
+        },
+        Command::Update { message } => {
+            update(message);
         },
         Command::Code {} => {
             open_code();
@@ -49,17 +59,17 @@ pub fn handle_command(command: &Command) {
 pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, force: bool) {
     let mut app_conf = app::get_conf();
 
-    let git_config_dir;
-    match dest {
-        Some(x) => git_config_dir = x.clone(),
-        None => git_config_dir = app_conf.git_config_dir.clone(),
-    }
+    let git_config_dir = dest.clone().unwrap_or(app_conf.git_config_dir.clone());
+    // match dest {
+    //     Some(x) => git_config_dir = x.clone(),
+    //     None => git_config_dir = app_conf.git_config_dir.clone(),
+    // }
 
-    let git_branch;
-    match branch {
-        Some(x) => git_branch = x.clone(),
-        None => git_branch = app_conf.git_branch.clone(),
-    }
+    let git_branch = branch.clone().unwrap_or(app_conf.git_branch.clone());
+    // match branch {
+    //     Some(x) => git_branch = x.clone(),
+    //     None => git_branch = app_conf.git_branch.clone(),
+    // }
 
     log::info!("git config init: {}, {}", git_config_dir, git_branch);
 
@@ -81,6 +91,25 @@ pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, force:
     app_conf.git_branch = git_branch.clone();
 
     base::save_conf(&app_conf);
+}
+
+pub fn update(message: &Option<String>) {
+    let app_conf = app::get_conf();
+
+    let commit_message = message.clone().unwrap_or("Cmt: Automatic update".to_string());
+
+    log::debug!("Commit message for update: {}", commit_message);
+
+    let no_changes = exec::status_in_dir("git", ["diff-index", "--quiet", "--exit-code", "HEAD"], &app_conf.git_config_dir);
+
+    if no_changes {
+        log::info!("No changes to commit!");
+    } else {
+        log::info!("Changes to commit!");
+        exec::status_in_dir("git", ["add", "."], &app_conf.git_config_dir);
+        exec::status_in_dir("git", ["commit", "-m", &commit_message], &app_conf.git_config_dir);
+        exec::status_in_dir("git", ["push"], &app_conf.git_config_dir);
+    }
 }
 
 pub fn open_code() {
