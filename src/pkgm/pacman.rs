@@ -1,5 +1,6 @@
 use crate::util::exec;
 use crate::config::pkgm;
+use crate::git_config;
 
 use clap::{Subcommand};
 
@@ -52,7 +53,8 @@ impl Pacman {
         let result = exec::status("sudo", command);
     
         if result {
-            pkgm_conf.add_package(package)
+            pkgm_conf.add_package(package);
+            git_config::update(&Some(format!("Add package '{}'", package)));
         }
     }
 
@@ -64,7 +66,8 @@ impl Pacman {
         let result = exec::status("sudo", command);
         
         if result {
-            pkgm_conf.remove_package(package)
+            pkgm_conf.remove_package(package);
+            git_config::update(&Some(format!("Remove package '{}'", package)));
         }
     }
 

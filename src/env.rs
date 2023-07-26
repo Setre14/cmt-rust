@@ -1,4 +1,5 @@
 use crate::config::env;
+use crate::git_config;
 use std::fs;
 use std::path::{PathBuf};
 use config::base::ConfigReader;
@@ -66,6 +67,7 @@ impl Env {
         Self::copy(&abs_path, &PathBuf::from(abs_env_path));
 
         conf.add_path(&env_path);
+        git_config::update(&Some(format!("Env: Add path '{}'", env_path)));
     }
 
     pub fn apply() {
@@ -100,6 +102,7 @@ impl Env {
         }
 
         conf.remove_path(&env_path);
+        git_config::update(&Some(format!("Env: Remove path '{}'", env_path)));
     }
 
     pub fn sync() {
@@ -111,6 +114,7 @@ impl Env {
 
             Self::copy(&PathBuf::from(system_path), &abs_env_path)
         }
+        git_config::update(&Some(format!("Env: sync")));
     }
 
     fn get_abs_path(path: &str) -> PathBuf {

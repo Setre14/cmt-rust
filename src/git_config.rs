@@ -100,14 +100,9 @@ pub fn update(message: &Option<String>) {
 
     log::debug!("Commit message for update: {}", commit_message);
 
-    let no_changes = exec::status_in_dir("git", ["diff-index", "--quiet", "--exit-code", "HEAD"], &app_conf.git_config_dir);
-
-    if no_changes {
-        log::info!("No changes to commit!");
-    } else {
-        log::info!("Changes to commit!");
-        exec::status_in_dir("git", ["add", "."], &app_conf.git_config_dir);
-        exec::status_in_dir("git", ["commit", "-m", &commit_message], &app_conf.git_config_dir);
+    exec::status_in_dir("git", ["add", "."], &app_conf.git_config_dir);
+    let result = exec::status_in_dir("git", ["commit", "-m", &commit_message], &app_conf.git_config_dir);
+    if result {
         exec::status_in_dir("git", ["push"], &app_conf.git_config_dir);
     }
 }
