@@ -8,20 +8,14 @@ use crate::config::app;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EnvConfig {
     pub user_home: String,
-    pub files_path: String,
-    pub folders_path: String,
-    pub files: Vec<String>,
-    pub folders: Vec<String>,
+    pub paths: Vec<String>,
 }
 
 impl Default for EnvConfig {
     fn default() -> Self { 
         EnvConfig {
             user_home: "user-home".to_string(),
-            files_path: "files".to_string(),
-            folders_path: "folders".to_string(),
-            files: Vec::new(),
-            folders: Vec::new(),
+            paths: Vec::new(),
         }
     }
 }
@@ -44,23 +38,13 @@ impl base::ConfigReader for EnvConfig {
 }
 
 impl EnvConfig {
-    pub fn add_file(&mut self, file: &String) {
-        base::add_to_list(&mut self.files, file);
+    pub fn add_path(&mut self, path: &String) {
+        base::add_to_list(&mut self.paths, path);
         base::save_conf(self);
     }
 
-    pub fn remove_file(&mut self, file: &String) {
-        base::remove_from_list(&mut self.files, file);
-        base::save_conf(self);
-    }
-
-    pub fn add_folder(&mut self, folder: &String) {
-        base::add_to_list(&mut self.folders, folder);
-        base::save_conf(self);
-    }
-
-    pub fn remove_folder(&mut self, folder: &String) {
-        base::remove_from_list(&mut self.folders, folder);
+    pub fn remove_path(&mut self, path: &String) {
+        base::remove_from_list(&mut self.paths, path);
         base::save_conf(self);
     }
 }

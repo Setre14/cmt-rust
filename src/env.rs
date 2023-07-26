@@ -1,10 +1,13 @@
 // use crate::util::exec;
 use crate::config::env;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{PathBuf};
 use config::base::ConfigReader;
 use std;
 use clap::{Subcommand};
+use fs_extra::dir;
+use fs_extra::copy_items;
+use dirs;
 
 #[derive(Subcommand)]
 pub enum Command {
@@ -54,12 +57,27 @@ impl Env {
         
         let mut abs_env_dir = abs_env_path.clone();
         abs_env_dir.pop();
+
+        println!("Abs env dir: {:#?}", abs_env_dir.clone());
+
+
         let _ = fs::create_dir_all(abs_env_dir.clone());
 
-        let result = fs::copy(abs_path, abs_env_path);
-        println!("Result: {:#?}", result);
+        if abs_path.is_dir() {
+            let mut options = dir::CopyOptions::new();
+            options.overwrite = true;
 
-        conf.add_file(&env_path);
+            let mut from_paths = Vec::new();
+            from_paths.push(abs_path);
+            let result = copy_items(&from_paths, &abs_env_dir, &options);
+            println!("Result: {:#?}", result);
+        } else {
+            let result = fs::copy(abs_path, abs_env_path);
+            println!("Result: {:#?}", result);
+        }
+        
+        conf.add_path(&env_path);
+        // TODO remove nested paths
     }
 
     pub fn apply() {
@@ -76,11 +94,16 @@ impl Env {
         println!("Abs env path: {:#?}", abs_env_path.clone());
         
         if abs_env_path.exists() {
-            let result = fs::remove_file(abs_env_path);
-            println!("Result: {:#?}", result);
+            if abs_path.is_dir() {
+                let result = fs::remove_dir_all(abs_env_path);
+                println!("Result: {:#?}", result);
+            } else {
+                let result = fs::remove_file(abs_env_path);
+                println!("Result: {:#?}", result);
+            }
         }
 
-        conf.remove_file(&env_path);
+        conf.remove_path(&env_path);
     }
 
     pub fn sync() {
@@ -99,10 +122,18 @@ impl Env {
     }
 
     fn get_env_path(path: &PathBuf) -> String {
+        let conf = env::get_conf();
         let mut env_path = path.clone().into_os_string().into_string().unwrap();
         if env_path.starts_with("/") {
             env_path = (&env_path[1..]).to_string();
         }
+
+        let mut user_home = dirs::home_dir().unwrap().into_os_string().into_string().unwrap();
+        user_home = (&user_home[1..]).to_string();
+        println!("user home: {:#?}", user_home.clone());
+
+        env_path = env_path.replace(&user_home, &conf.user_home);
+        env_path = env_path.replace("~", &conf.user_home);
 
         return env_path;
     }
