@@ -39,6 +39,14 @@ impl base::ConfigReader for EnvConfig {
 
 impl EnvConfig {
     pub fn add_path(&mut self, path: &String) {
+        for p in self.paths.clone() {
+            if p.starts_with(path) {
+                println!("starts");
+                base::remove_from_list(&mut self.paths, &p);
+            } else if path.starts_with(&p) {
+                return;
+            }
+        }
         base::add_to_list(&mut self.paths, path);
         base::save_conf(self);
     }

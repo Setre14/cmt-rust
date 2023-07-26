@@ -1,4 +1,3 @@
-// use crate::util::exec;
 use crate::config::env;
 use std::fs;
 use std::path::{PathBuf};
@@ -77,7 +76,6 @@ impl Env {
         }
         
         conf.add_path(&env_path);
-        // TODO remove nested paths
     }
 
     pub fn apply() {
@@ -126,6 +124,9 @@ impl Env {
         let mut env_path = path.clone().into_os_string().into_string().unwrap();
         if env_path.starts_with("/") {
             env_path = (&env_path[1..]).to_string();
+        }
+        if env_path.ends_with("/") {
+            env_path.pop();
         }
 
         let mut user_home = dirs::home_dir().unwrap().into_os_string().into_string().unwrap();
