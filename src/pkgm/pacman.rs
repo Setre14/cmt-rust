@@ -1,20 +1,26 @@
 use crate::util::exec;
 use crate::config::pkgm;
+use crate::git_config;
 
 use clap::{Subcommand};
 
 #[derive(Subcommand)]
 pub enum Command {
+    /// Install a package
     #[command(name = "-S")]
     Sync {
+        /// Package to install
         package: String,
     },
 
+    /// Remove a package
     #[command(name = "-R")]
     Remove {
+        /// Package to remove
         package: String,
     },
 
+    /// Update all packages
     #[command(name = "-Syu")]
     Update {}
 
@@ -47,7 +53,8 @@ impl Pacman {
         let result = exec::status("sudo", command);
     
         if result {
-            pkgm_conf.add_package(package)
+            pkgm_conf.add_package(package);
+            git_config::update(&Some(format!("Add package '{}'", package)));
         }
     }
 
@@ -59,7 +66,8 @@ impl Pacman {
         let result = exec::status("sudo", command);
         
         if result {
-            pkgm_conf.remove_package(package)
+            pkgm_conf.remove_package(package);
+            git_config::update(&Some(format!("Remove package '{}'", package)));
         }
     }
 
