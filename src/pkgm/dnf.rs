@@ -5,14 +5,19 @@ use clap::{Subcommand};
 
 #[derive(Subcommand)]
 pub enum Command {
+    /// Install a package
     Install {
+        /// Package to install
         package: String,
     },
 
+    /// Remove a package
     Remove {
+        /// Package to remove
         package: String,
     },
 
+    /// Update all packages
     Upgrade {}
 
 }

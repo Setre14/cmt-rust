@@ -8,20 +8,27 @@ use crate::util::exec;
 
 #[derive(Subcommand)]
 pub enum Command {
+    /// Init app config and clone git config
     Init {
+        /// Git clone url
         url: String,
 
+        /// Destination for git clone, default: ~/.config/cmt-rust
         #[arg(short, long)]
         dest: Option<String>,
 
+        /// Branch to checkout otherwise default branch is used
         #[arg(short, long)]
         branch: Option<String>,
 
+        /// Remove folder if destination already exists
         #[arg(short, long)]
         force: bool,
-
     },
+
+    /// Open git repo in VS Code
     Code {},
+    /// Open git repo in NVim
     Nvim {},
 }
 

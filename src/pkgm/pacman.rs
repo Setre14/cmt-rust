@@ -5,16 +5,21 @@ use clap::{Subcommand};
 
 #[derive(Subcommand)]
 pub enum Command {
+    /// Install a package
     #[command(name = "-S")]
     Sync {
+        /// Package to install
         package: String,
     },
 
+    /// Remove a package
     #[command(name = "-R")]
     Remove {
+        /// Package to remove
         package: String,
     },
 
+    /// Update all packages
     #[command(name = "-Syu")]
     Update {}
 

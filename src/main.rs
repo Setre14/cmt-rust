@@ -40,35 +40,43 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Init app config and clone git config
     Init {
+        /// Git clone url
         url: String,
 
+        /// Destination for git clone, default: ~/.config/cmt-rust
         #[arg(short, long)]
         dest: Option<String>,
 
+        /// Branch to checkout otherwise default branch is used
         #[arg(short, long)]
         branch: Option<String>,
 
+        /// Remove folder if destination already exists
         #[arg(short, long)]
         force: bool,
-
     },
 
+    /// Interact with git config
     Config {
         #[command(subcommand)]
         command: git_config::Command,
     },
 
+    /// Add, remove and sync files and folders
     Env {
         #[command(subcommand)]
         command: env::Command,
     },
 
+    /// Install, remove and update dnf packages
     Dnf {
         #[command(subcommand)]
         command: dnf::Command,
     },
 
+    /// Install, remove and update pacman packages
     Pacman {
         #[command(subcommand)]
         command: pacman::Command,

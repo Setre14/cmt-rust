@@ -10,14 +10,23 @@ use dirs;
 
 #[derive(Subcommand)]
 pub enum Command {
+    /// Add file/folder to sync
     Add {
+        /// Path to add to sync
         path: String,
     },
+
+    /// Copies all env defined in the user config to the system
     Apply {
     },
+
+    /// Remove file/folder from sync
     Remove {
+        /// Path to remove from sync
         path: String,
     },
+
+    /// Updates all files defined in the user config from the system to the config dir
     Sync {
     }
 }
