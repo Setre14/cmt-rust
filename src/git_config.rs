@@ -54,13 +54,13 @@ pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, force:
         None => git_branch = app_conf.git_branch.clone(),
     }
 
-    println!("git config init: {}, {}", git_config_dir, git_branch);
+    log::info!("git config init: {}, {}", git_config_dir, git_branch);
 
     if Path::new(&git_config_dir).is_dir() {
         if force {
             let _ = fs::remove_dir_all(Path::new(&git_config_dir));
         } else {
-            println!("dir exists");
+            log::info!("dir exists");
             std::process::exit(1);
         }
     }

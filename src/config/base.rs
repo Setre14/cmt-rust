@@ -43,7 +43,7 @@ pub fn save_conf<T: Serialize + ConfigReader>(conf: &T) {
         .truncate(true)
         .open(conf_file.clone()).expect("Could not open conf file");
 
-    println!("{}", conf_file.into_os_string().into_string().unwrap());
+    log::info!("{}", conf_file.into_os_string().into_string().unwrap());
 
     serde_json::to_writer_pretty(&file, conf).expect("Failed to write conf");
 }

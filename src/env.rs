@@ -48,16 +48,16 @@ impl Env {
         let mut conf = env::get_conf();
 
         let abs_path = Self::get_abs_path(&path);
-        println!("Abs path: {:#?}", abs_path.clone());
+        log::info!("Abs path: {:#?}", abs_path.clone());
         let env_path = Self::get_env_path(&abs_path);
-        println!("Env path: {}", env_path.clone());
+        log::info!("Env path: {}", env_path.clone());
         let abs_env_path = Self::get_abs_env_path(&env_path);
-        println!("Abs env path: {:#?}", abs_env_path.clone());
+        log::info!("Abs env path: {:#?}", abs_env_path.clone());
         
         let mut abs_env_dir = abs_env_path.clone();
         abs_env_dir.pop();
 
-        println!("Abs env dir: {:#?}", abs_env_dir.clone());
+        log::info!("Abs env dir: {:#?}", abs_env_dir.clone());
 
 
         let _ = fs::create_dir_all(abs_env_dir.clone());
@@ -69,10 +69,10 @@ impl Env {
             let mut from_paths = Vec::new();
             from_paths.push(abs_path);
             let result = copy_items(&from_paths, &abs_env_dir, &options);
-            println!("Result: {:#?}", result);
+            log::info!("Result: {:#?}", result);
         } else {
             let result = fs::copy(abs_path, abs_env_path);
-            println!("Result: {:#?}", result);
+            log::info!("Result: {:#?}", result);
         }
         
         conf.add_path(&env_path);
@@ -85,19 +85,19 @@ impl Env {
         let mut conf = env::get_conf();
 
         let abs_path = Self::get_abs_path(&path);
-        println!("Abs path: {:#?}", abs_path.clone());
+        log::info!("Abs path: {:#?}", abs_path.clone());
         let env_path = Self::get_env_path(&abs_path);
-        println!("Env path: {}", env_path.clone());
+        log::info!("Env path: {}", env_path.clone());
         let abs_env_path = Self::get_abs_env_path(&env_path);
-        println!("Abs env path: {:#?}", abs_env_path.clone());
+        log::info!("Abs env path: {:#?}", abs_env_path.clone());
         
         if abs_env_path.exists() {
             if abs_path.is_dir() {
                 let result = fs::remove_dir_all(abs_env_path);
-                println!("Result: {:#?}", result);
+                log::info!("Result: {:#?}", result);
             } else {
                 let result = fs::remove_file(abs_env_path);
-                println!("Result: {:#?}", result);
+                log::info!("Result: {:#?}", result);
             }
         }
 
@@ -131,7 +131,7 @@ impl Env {
 
         let mut user_home = dirs::home_dir().unwrap().into_os_string().into_string().unwrap();
         user_home = (&user_home[1..]).to_string();
-        println!("user home: {:#?}", user_home.clone());
+        log::info!("user home: {:#?}", user_home.clone());
 
         env_path = env_path.replace(&user_home, &conf.user_home);
         env_path = env_path.replace("~", &conf.user_home);

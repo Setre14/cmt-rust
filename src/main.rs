@@ -2,6 +2,11 @@ extern crate clap;
 extern crate dirs;
 extern crate serde;
 extern crate fs_extra;
+extern crate log;
+extern crate stderrlog;
+
+// use log;
+// use stderrlog;
 
 mod config;
 mod git_config;
@@ -22,6 +27,13 @@ use pkgm::pacman::Pacman;
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
+    /// Silence all output
+    #[arg(short, long)]
+    quiet: bool,
+    /// Verbose mode (-v, -vv, -vvv, etc)
+    #[arg(short, long, action = clap::ArgAction::Count)]
+    verbose: u8,
+
     #[command(subcommand)]
     command: Option<Command>,
 }
@@ -65,6 +77,20 @@ enum Command {
 
 fn main() {
     let cli = Cli::parse();
+
+    stderrlog::new()
+        .module(module_path!())
+        .quiet(cli.quiet)
+        .verbosity((cli.verbose as usize) + 1)
+        .show_module_names(true)
+        // .timestamp(stderrlog::Timestamp::Second)
+        .init()
+        .unwrap();
+    log::trace!("trace message");
+    log::debug!("debug message");
+    log::info!("info message");
+    log::warn!("warn message");
+    log::error!("error message");
     
     match &cli.command {
         Some(Command::Init { url, dest, branch, force }) => {
