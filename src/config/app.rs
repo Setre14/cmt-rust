@@ -12,6 +12,7 @@ pub struct AppConfig {
     pub git_config_dir: String,
     pub git_clone_url: String,
     pub git_branch: String,
+    pub debug_level: u8,
 }
 
 impl Default for AppConfig {
@@ -20,6 +21,7 @@ impl Default for AppConfig {
             git_config_dir: get_default_git_config_dir(),
             git_clone_url: "".to_string(),
             git_branch: get_default_git_branch(),
+            debug_level: 2,
         }
     }
 }

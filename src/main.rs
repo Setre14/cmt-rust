@@ -17,6 +17,7 @@ mod env;
 use clap::{Parser, Subcommand};
 
 use config::base;
+use config::app;
 // use env;
 use env::Env;
 use pkgm::dnf;
@@ -84,21 +85,18 @@ enum Command {
 }
 
 fn main() {
+    let conf = app::get_conf();
+
     let cli = Cli::parse();
 
     stderrlog::new()
         .module(module_path!())
         .quiet(cli.quiet)
-        .verbosity((cli.verbose as usize) + 1)
+        .verbosity((cli.verbose + conf.debug_level) as usize)
         .show_module_names(true)
         // .timestamp(stderrlog::Timestamp::Second)
         .init()
         .unwrap();
-    log::trace!("trace message");
-    log::debug!("debug message");
-    log::info!("info message");
-    log::warn!("warn message");
-    log::error!("error message");
     
     match &cli.command {
         Some(Command::Init { url, dest, branch, force }) => {

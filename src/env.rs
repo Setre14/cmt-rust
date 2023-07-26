@@ -63,31 +63,20 @@ impl Env {
         let abs_env_path = Self::get_abs_env_path(&env_path);
         log::info!("Abs env path: {:#?}", abs_env_path.clone());
         
-        let mut abs_env_dir = abs_env_path.clone();
-        abs_env_dir.pop();
+        Self::copy(&abs_path, &PathBuf::from(abs_env_path));
 
-        log::info!("Abs env dir: {:#?}", abs_env_dir.clone());
-
-
-        let _ = fs::create_dir_all(abs_env_dir.clone());
-
-        if abs_path.is_dir() {
-            let mut options = dir::CopyOptions::new();
-            options.overwrite = true;
-
-            let mut from_paths = Vec::new();
-            from_paths.push(abs_path);
-            let result = copy_items(&from_paths, &abs_env_dir, &options);
-            log::info!("Result: {:#?}", result);
-        } else {
-            let result = fs::copy(abs_path, abs_env_path);
-            log::info!("Result: {:#?}", result);
-        }
-        
         conf.add_path(&env_path);
     }
 
     pub fn apply() {
+        let conf = env::get_conf();
+
+        for path in conf.paths {
+            let abs_env_path = Self::get_abs_env_path(&path);
+            let system_path = Self::get_system_path(&path);
+
+            Self::copy(&abs_env_path, &PathBuf::from(system_path))
+        }
     }
 
     pub fn remove(path: &String) {
@@ -114,6 +103,14 @@ impl Env {
     }
 
     pub fn sync() {
+        let conf = env::get_conf();
+
+        for path in conf.paths {
+            let abs_env_path = Self::get_abs_env_path(&path);
+            let system_path = Self::get_system_path(&path);
+
+            Self::copy(&PathBuf::from(system_path), &abs_env_path)
+        }
     }
 
     fn get_abs_path(path: &str) -> PathBuf {
@@ -155,5 +152,35 @@ impl Env {
         abs_env_path.push(env_path);
 
         return abs_env_path;
+    }
+
+    fn get_system_path(path: &String) -> String {
+        let conf = env::get_conf();
+        let user_home = dirs::home_dir().unwrap().into_os_string().into_string().unwrap();
+
+        return path.replace(&conf.user_home, &user_home);
+    }
+
+    fn copy(source: &PathBuf, destination: &PathBuf) {
+        if source.is_dir() {
+            let mut options = dir::CopyOptions::new();
+            options.overwrite = true;
+
+            let mut dest_dir = destination.clone();
+            dest_dir.pop();
+            let _ = fs::create_dir_all(dest_dir.clone());
+
+            let mut from_paths = Vec::new();
+            from_paths.push(source);
+
+            log::info!("Copy directoy from '{:#?}' to '{:#?}'", source, destination);
+
+            let result = copy_items(&from_paths, &dest_dir, &options);
+            log::debug!("Result: {:#?}", result);
+        } else {
+            log::info!("Copy file from '{:#?}' to '{:#?}'", source, destination);
+            let result = fs::copy(source, destination);
+            log::debug!("Result: {:#?}", result);
+        }
     }
 }
