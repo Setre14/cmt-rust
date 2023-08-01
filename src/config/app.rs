@@ -9,9 +9,13 @@ use crate::base;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppConfig {
+    #[serde(default)]
     pub git_config_dir: String,
+    #[serde(default)]
     pub git_clone_url: String,
+    #[serde(default)]
     pub git_branch: String,
+    #[serde(default = "get_default_debug_level")]
     pub debug_level: u8,
 }
 
@@ -21,7 +25,7 @@ impl Default for AppConfig {
             git_config_dir: get_default_git_config_dir(),
             git_clone_url: "".to_string(),
             git_branch: get_default_git_branch(),
-            debug_level: 2,
+            debug_level: get_default_debug_level(),
         }
     }
 }
@@ -62,4 +66,8 @@ fn get_default_git_branch() -> String {
     let stdout = String::from_utf8(output.stdout).unwrap().replace("\n", "");
 
     return stdout;
+}
+
+fn get_default_debug_level() -> u8 {
+    return 2;
 }

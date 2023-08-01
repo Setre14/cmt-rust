@@ -8,9 +8,13 @@ use crate::config::app;
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct PkgmConfig {
+    #[serde(default)]
     pub pkgm: String,
+    #[serde(default)]
     pub repos: Vec<String>,
+    #[serde(default)]
     pub remotes: Vec<String>,
+    #[serde(default)]
     pub packages: Vec<String>,
 }
 

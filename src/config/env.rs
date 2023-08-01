@@ -7,17 +7,23 @@ use crate::config::app;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EnvConfig {
+    #[serde(default = "get_user_home")]
     pub user_home: String,
+    #[serde(default)]
     pub paths: Vec<String>,
 }
 
 impl Default for EnvConfig {
     fn default() -> Self { 
         EnvConfig {
-            user_home: "user-home".to_string(),
+            user_home: get_user_home(),
             paths: Vec::new(),
         }
     }
+}
+
+fn get_user_home() -> String {
+    return "user-home".to_string();
 }
 
 impl base::ConfigReader for EnvConfig {
