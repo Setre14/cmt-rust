@@ -1,25 +1,16 @@
 use std::path::PathBuf;
+use serde::{Serialize, de};
+use strum::IntoEnumIterator;
 use std::fs::OpenOptions;
 use std::fs::File;
 use std::io::BufReader;
-use strum::IntoEnumIterator;
 use std::string::ToString;
 
-use std::process::{Command, Stdio};
-
-use serde::{Serialize, de};
-
 use crate::config::config_track::ConfigTrack;
-
-
-pub trait StringAccessable {
-    fn get_string(&self, field_string: &str) -> Result<&String, String>;
-    fn get_vec(&self, field_string: &str) -> Result<&Vec<String>, String>;
-    fn get_u8(&self, field_string: &str) -> Result<&u8, String>;
-}
+use crate::config::config_util::ConfigUtil;
+use crate::config::string_accessable::StringAccessable;
 
 pub trait ConfigReader {
-    // fn get_conf_name(&self) -> String;
     fn get_conf_dir(&self) -> PathBuf;
     
     fn get_conf_file(&self, track: &ConfigTrack) -> PathBuf {   
@@ -28,7 +19,7 @@ pub trait ConfigReader {
 
         let filename = match track {
             ConfigTrack::GLOBAL => "global".to_string(),
-            ConfigTrack::SYSTEM => get_hostname(),
+            ConfigTrack::SYSTEM => ConfigUtil::get_hostname(),
         };
 
         conf_buf.push(format!("{}.json", filename));
@@ -94,29 +85,4 @@ pub fn save_conf<T: Serialize + ConfigReader>(conf: &T) {
     log::info!("Save conf file: {}", conf_file.into_os_string().into_string().unwrap());
 
     serde_json::to_writer_pretty(&file, conf).expect("Failed to write conf");
-}
-
-pub fn add_to_list(list: &mut Vec<String>, item: &String) {
-    if !list.contains(item) {
-        list.push(item.clone().to_string());
-    }
-    list.sort();
-}
-
-pub fn remove_from_list(list: &mut Vec<String>, item: &String) {
-    if list.contains(item) {
-        let index = list.iter().position(|x| *x == item.to_string()).unwrap();
-        list.remove(index);
-    }
-    list.sort();
-}
-
-fn get_hostname() -> String {
-    let output = Command::new("hostname")
-        .stdout(Stdio::piped())
-        .output()
-        .unwrap();
-    let stdout = String::from_utf8(output.stdout).unwrap().replace("\n", "");
-
-    return stdout;
 }

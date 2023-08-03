@@ -7,9 +7,12 @@ use std::str::FromStr;
 use strum_macros::EnumString;
 use strum::{EnumIter, IntoEnumIterator};
 
-use crate::base;
 use crate::config::app;
+use crate::config::config_reader;
+use crate::config::config_reader::ConfigReader;
 use crate::config::config_track::ConfigTrack;
+use crate::config::config_util::ConfigUtil;
+use crate::config::string_accessable::StringAccessable;
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct PkgmConfig {
@@ -25,7 +28,7 @@ pub struct PkgmConfig {
     pub packages: Vec<String>,
 }
 
-impl base::StringAccessable for PkgmConfig {
+impl StringAccessable for PkgmConfig {
     fn get_string(&self, field_string: &str) -> Result<&String, String> {
         match field_string {
             "pkgm" => Ok(&self.pkgm),
@@ -49,7 +52,7 @@ impl base::StringAccessable for PkgmConfig {
     }
 }
 
-impl base::ConfigReader for PkgmConfig {
+impl ConfigReader for PkgmConfig {
     // fn get_conf_name(&self) -> String {
     //     return self.pkgm.to_string().to_lowercase();
     // }
@@ -74,7 +77,7 @@ impl base::ConfigReader for PkgmConfig {
         self.track = track.to_string();
     }
 
-    fn merge<T: base::StringAccessable + Clone + std::fmt::Debug>(&mut self, other: T) {
+    fn merge<T: StringAccessable + Clone + std::fmt::Debug>(&mut self, other: T) {
         self.pkgm = other.get_string("pkgm").unwrap().to_string();
         log::debug!("Merge self: {:?}", self.clone());
         log::debug!("Merge other: {:?}", other.clone());
@@ -94,13 +97,13 @@ impl base::ConfigReader for PkgmConfig {
 
 impl PkgmConfig {
     pub fn add_package(&mut self, package: &String) {
-        base::add_to_list(&mut self.packages, package);
-        base::save_conf(self);
+        ConfigUtil::add_to_list(&mut self.packages, package);
+        config_reader::save_conf(self);
     }
 
     pub fn remove_package(&mut self, package: &String) {
-        base::remove_from_list(&mut self.packages, package);
-        base::save_conf(self);
+        ConfigUtil::remove_from_list(&mut self.packages, package);
+        config_reader::save_conf(self);
     }
 }
 
@@ -124,12 +127,12 @@ impl Default for Pkgm {
 // }
 
 pub fn get_conf(pkgm: &Pkgm, track: &ConfigTrack) -> PkgmConfig {
-    return base::get_conf(&track, PkgmConfig { pkgm: pkgm.to_string(), ..Default::default() });
+    return config_reader::get_conf(&track, PkgmConfig { pkgm: pkgm.to_string(), ..Default::default() });
 }
 
 #[allow(dead_code)]
 pub fn get_combined_conf(pkgm: &Pkgm) -> PkgmConfig {
-    return base::get_combined_conf(PkgmConfig { pkgm: pkgm.to_string(), ..Default::default() });
+    return config_reader::get_combined_conf(PkgmConfig { pkgm: pkgm.to_string(), ..Default::default() });
 }
 
 fn merge_vec(a: &mut Vec<String>, b: &Vec<String>) {

@@ -3,9 +3,12 @@ use std::path::PathBuf;
 use std::fs;
 use std::str::FromStr;
 
-use crate::base;
 use crate::config::app;
 use crate::config::config_track::ConfigTrack;
+use crate::config::config_reader::ConfigReader;
+use crate::config::config_util::ConfigUtil;
+use crate::config::string_accessable::StringAccessable;
+use crate::config::config_reader;
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
 pub struct EnvConfig {
@@ -30,7 +33,7 @@ fn get_user_home() -> String {
     return "user-home".to_string();
 }
 
-impl base::StringAccessable for EnvConfig {
+impl StringAccessable for EnvConfig {
     fn get_string(&self, field_string: &str) -> Result<&String, String> {
         match field_string {
             "user_home" => Ok(&self.user_home),
@@ -52,7 +55,7 @@ impl base::StringAccessable for EnvConfig {
     }
 }
 
-impl base::ConfigReader for EnvConfig {
+impl ConfigReader for EnvConfig {
     // fn get_conf_name(&self) -> String {
     //     return "env".to_string();
     // }
@@ -76,7 +79,7 @@ impl base::ConfigReader for EnvConfig {
         self.track = track.to_string();
     }
 
-    fn merge<T: base::StringAccessable + Clone + std::fmt::Debug>(&mut self, other: T) {
+    fn merge<T: StringAccessable + Clone + std::fmt::Debug>(&mut self, other: T) {
         self.user_home = other.get_string("user_home").unwrap().to_string();
 
         let paths = other.get_vec("paths").unwrap();
@@ -88,27 +91,27 @@ impl EnvConfig {
     pub fn add_path(&mut self, path: &String) {
         for p in self.paths.clone() {
             if p.starts_with(path) {
-                base::remove_from_list(&mut self.paths, &p);
+                ConfigUtil::remove_from_list(&mut self.paths, &p);
             } else if path.starts_with(&p) {
                 return;
             }
         }
-        base::add_to_list(&mut self.paths, path);
-        base::save_conf(self);
+        ConfigUtil::add_to_list(&mut self.paths, path);
+        config_reader::save_conf(self);
     }
 
     pub fn remove_path(&mut self, path: &String) {
-        base::remove_from_list(&mut self.paths, path);
-        base::save_conf(self);
+        ConfigUtil::remove_from_list(&mut self.paths, path);
+        config_reader::save_conf(self);
     }
 }
 
 pub fn get_conf(track: &ConfigTrack) -> EnvConfig {
-    return base::get_conf(track, EnvConfig { ..Default::default() });
+    return config_reader::get_conf(track, EnvConfig { ..Default::default() });
 }
 
 pub fn get_combined_conf() -> EnvConfig {
-    return base::get_combined_conf(EnvConfig { ..Default::default() });
+    return config_reader::get_combined_conf(EnvConfig { ..Default::default() });
 }
 
 fn merge_vec(a: &mut Vec<String>, b: &Vec<String>) {

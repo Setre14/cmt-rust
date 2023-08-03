@@ -1,7 +1,7 @@
 use crate::config::env;
 use crate::git_config;
 use crate::config::config_track::ConfigTrack;
-use crate::config::base::ConfigReader;
+use crate::config::config_reader::ConfigReader;
 
 use std::fs;
 use std::path::{PathBuf};

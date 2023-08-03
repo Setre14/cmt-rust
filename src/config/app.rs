@@ -1,16 +1,18 @@
 use serde::{Serialize, Deserialize};
-use std::process::{Command, Stdio};
 use std::path::PathBuf;
 use dirs::config_dir;
 use std::fs;
 use std::str::FromStr;
 
-use crate::base;
+use crate::config::config_reader;
+use crate::config::config_reader::ConfigReader;
 use crate::config::config_track::ConfigTrack;
+use crate::config::config_util::ConfigUtil;
+use crate::config::string_accessable::StringAccessable;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AppConfig {
-    #[serde(default = "get_hostname")]
+    #[serde(default = "ConfigUtil::get_hostname")]
     pub track: String,
     #[serde(default = "get_default_debug_level")]
     pub debug_level: u8,
@@ -18,7 +20,7 @@ pub struct AppConfig {
     pub git_config_dir: String,
     #[serde(default)]
     pub git_clone_url: String,
-    #[serde(default = "get_hostname")]
+    #[serde(default = "ConfigUtil::get_hostname")]
     pub git_branch: String,
 }
 
@@ -27,14 +29,14 @@ impl Default for AppConfig {
         AppConfig {
             git_config_dir: get_default_git_config_dir(),
             git_clone_url: "".to_string(),
-            git_branch: get_hostname(),
+            git_branch: ConfigUtil::get_hostname(),
             debug_level: get_default_debug_level(),
-            track: get_hostname()
+            track: ConfigUtil::get_hostname()
         }
     }
 }
 
-impl base::StringAccessable for AppConfig {
+impl StringAccessable for AppConfig {
     fn get_string(&self, field_string: &str) -> Result<&String, String> {
         match field_string {
             "git_config_dir" => Ok(&self.git_config_dir),
@@ -58,7 +60,7 @@ impl base::StringAccessable for AppConfig {
     }
 }
 
-impl base::ConfigReader for AppConfig {
+impl ConfigReader for AppConfig {
     fn get_conf_dir(&self) -> PathBuf {
         let mut conf_dir = config_dir().expect("Could not get config dir");
         conf_dir.push("cmt-rust");
@@ -76,7 +78,7 @@ impl base::ConfigReader for AppConfig {
         self.track = track.to_string();
     }
 
-    fn merge<T: base::StringAccessable + Clone + std::fmt::Debug>(&mut self, other: T) {
+    fn merge<T: StringAccessable + Clone + std::fmt::Debug>(&mut self, other: T) {
         self.git_config_dir = other.get_string("git_config_dir").unwrap().to_string();
         self.git_clone_url = other.get_string("git_clone_url").unwrap().to_string();
         self.debug_level = other.get_u8("debug_level").unwrap().clone();
@@ -86,7 +88,7 @@ impl base::ConfigReader for AppConfig {
 }
 
 pub fn get_conf() -> AppConfig {
-    return base::get_conf(&ConfigTrack::GLOBAL, AppConfig { ..Default::default() });
+    return config_reader::get_conf(&ConfigTrack::GLOBAL, AppConfig { ..Default::default() });
 }
 
 fn get_default_git_config_dir() -> String {
@@ -98,16 +100,6 @@ fn get_default_git_config_dir() -> String {
     default_git_config_dir.push("git-config".to_string());
 
     return default_git_config_dir.into_os_string().into_string().unwrap();
-}
-
-fn get_hostname() -> String {
-    let output = Command::new("hostname")
-        .stdout(Stdio::piped())
-        .output()
-        .unwrap();
-    let stdout = String::from_utf8(output.stdout).unwrap().replace("\n", "");
-
-    return stdout;
 }
 
 fn get_default_debug_level() -> u8 {

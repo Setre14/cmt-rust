@@ -6,7 +6,6 @@ mod env;
 
 use clap::{Parser, Subcommand};
 
-use config::base;
 use config::app;
 // use env;
 use env::Env;

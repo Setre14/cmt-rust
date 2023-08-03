@@ -3,10 +3,10 @@ use std::fs;
 use clap::{Subcommand};
 
 use crate::config::app;
-use crate::config::base;
 use crate::config::env;
 use crate::config::pkgm;
 use crate::util::exec;
+use crate::config::config_reader;
 
 #[derive(Subcommand)]
 pub enum Command {
@@ -99,7 +99,7 @@ pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, track:
     app_conf.git_branch = git_branch.clone();
     app_conf.track = config_track.clone();
 
-    base::save_conf(&app_conf);
+    config_reader::save_conf(&app_conf);
 }
 
 pub fn update(message: &Option<String>) {
