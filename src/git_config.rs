@@ -4,6 +4,8 @@ use clap::{Subcommand};
 
 use crate::config::app;
 use crate::config::base;
+use crate::config::env;
+use crate::config::pkgm;
 use crate::util::exec;
 
 #[derive(Subcommand)]
@@ -21,6 +23,10 @@ pub enum Command {
         #[arg(short, long)]
         branch: Option<String>,
 
+        /// Branch to checkout otherwise default branch is used
+        #[arg(short, long)]
+        track: Option<String>,
+
         /// Remove folder if destination already exists
         #[arg(short, long)]
         force: bool,
@@ -33,6 +39,9 @@ pub enum Command {
         message: Option<String>,
     },
 
+    /// Remove duplicates in global and system config
+    Cleanup {},
+
     /// Open git repo in VS Code
     Code {},
     /// Open git repo in NVim
@@ -41,11 +50,14 @@ pub enum Command {
 
 pub fn handle_command(command: &Command) {
     match command {
-        Command::Init { url, dest, branch, force } => {
-            init(url, dest, branch, *force);
+        Command::Init { url, dest, branch, track, force } => {
+            init(url, dest, branch, track, *force);
         },
         Command::Update { message } => {
             update(message);
+        },
+        Command::Cleanup {} => {
+            cleanup();
         },
         Command::Code {} => {
             open_code();
@@ -56,20 +68,12 @@ pub fn handle_command(command: &Command) {
     }
 }
 
-pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, force: bool) {
+pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, track: &Option<String>, force: bool) {
     let mut app_conf = app::get_conf();
 
     let git_config_dir = dest.clone().unwrap_or(app_conf.git_config_dir.clone());
-    // match dest {
-    //     Some(x) => git_config_dir = x.clone(),
-    //     None => git_config_dir = app_conf.git_config_dir.clone(),
-    // }
-
     let git_branch = branch.clone().unwrap_or(app_conf.git_branch.clone());
-    // match branch {
-    //     Some(x) => git_branch = x.clone(),
-    //     None => git_branch = app_conf.git_branch.clone(),
-    // }
+    let config_track = track.clone().unwrap_or(app_conf.git_branch.clone());
 
     log::info!("git config init: {}, {}", git_config_dir, git_branch);
 
@@ -84,11 +88,16 @@ pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, force:
 
     exec::status("git", ["clone", url, &git_config_dir]);
 
-    exec::status_in_dir("git", ["checkout", "-b", &git_branch], &git_config_dir);
+    let result = exec::status_in_dir("git", ["checkout", &git_branch], &git_config_dir);
+
+    if !result {
+        exec::status_in_dir("git", ["checkout", "-b", &git_branch], &git_config_dir);
+    } 
     
     app_conf.git_clone_url = url.clone();
     app_conf.git_config_dir = git_config_dir.clone();
     app_conf.git_branch = git_branch.clone();
+    app_conf.track = config_track.clone();
 
     base::save_conf(&app_conf);
 }
@@ -105,6 +114,11 @@ pub fn update(message: &Option<String>) {
     if result {
         exec::status_in_dir("git", ["push"], &app_conf.git_config_dir);
     }
+}
+
+pub fn cleanup() {
+    env::cleanup();
+    pkgm::cleanup();
 }
 
 pub fn open_code() {

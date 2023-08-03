@@ -1,8 +1,10 @@
 use crate::config::env;
 use crate::git_config;
+use crate::config::config_track::ConfigTrack;
+use crate::config::base::ConfigReader;
+
 use std::fs;
 use std::path::{PathBuf};
-use config::base::ConfigReader;
 use std;
 use clap::{Subcommand};
 use fs_extra::dir;
@@ -15,6 +17,10 @@ pub enum Command {
     Add {
         /// Path to add to sync
         path: String,
+
+        /// Add path globally
+        #[arg(short, long)]
+        global: bool,
     },
 
     /// Copies all env defined in the user config to the system
@@ -25,6 +31,10 @@ pub enum Command {
     Remove {
         /// Path to remove from sync
         path: String,
+
+        /// Remove path globally
+        #[arg(short, long)]
+        global: bool,
     },
 
     /// Updates all files defined in the user config from the system to the config dir
@@ -39,14 +49,14 @@ pub struct Env {
 impl Env {
     pub fn handle_command(command: &Command) {
         match command {
-            Command::Add {path} => {
-                Self::add(path);
+            Command::Add {path, global} => {
+                Self::add(path, global);
             },
             Command::Apply {} => {
                 Self::apply();
             },
-            Command::Remove {path} => {
-                Self::remove(path);
+            Command::Remove {path, global} => {
+                Self::remove(path, global);
             },
             Command::Sync {} => {
                 Self::sync();
@@ -54,8 +64,13 @@ impl Env {
         }
     }
 
-    pub fn add(path: &String) {
-        let mut conf = env::get_conf();
+    pub fn add(path: &String, global: &bool) {
+        let track = match global {
+            true => ConfigTrack::GLOBAL,
+            false => ConfigTrack::SYSTEM,
+        };
+
+        let mut conf = env::get_conf(&track);
 
         let abs_path = Self::get_abs_path(&path);
         log::info!("Abs path: {:#?}", abs_path.clone());
@@ -71,7 +86,7 @@ impl Env {
     }
 
     pub fn apply() {
-        let conf = env::get_conf();
+        let conf = env::get_combined_conf();
 
         for path in conf.paths {
             let abs_env_path = Self::get_abs_env_path(&path);
@@ -81,8 +96,13 @@ impl Env {
         }
     }
 
-    pub fn remove(path: &String) {
-        let mut conf = env::get_conf();
+    pub fn remove(path: &String, global: &bool) {
+        let track = match global {
+            true => ConfigTrack::GLOBAL,
+            false => ConfigTrack::SYSTEM,
+        };
+
+        let mut conf = env::get_conf(&track);
 
         let abs_path = Self::get_abs_path(&path);
         log::info!("Abs path: {:#?}", abs_path.clone());
@@ -106,7 +126,7 @@ impl Env {
     }
 
     pub fn sync() {
-        let conf = env::get_conf();
+        let conf = env::get_combined_conf();
 
         for path in conf.paths {
             let abs_env_path = Self::get_abs_env_path(&path);
@@ -130,7 +150,7 @@ impl Env {
     }
 
     fn get_env_path(path: &PathBuf) -> String {
-        let conf = env::get_conf();
+        let conf = env::get_conf(&ConfigTrack::GLOBAL);
         let mut env_path = path.clone().into_os_string().into_string().unwrap();
         if env_path.starts_with("/") {
             env_path = (&env_path[1..]).to_string();
@@ -150,7 +170,7 @@ impl Env {
     }
 
     fn get_abs_env_path(env_path: &String) -> PathBuf {
-        let conf = env::get_conf();
+        let conf = env::get_conf(&ConfigTrack::GLOBAL);
 
         let mut abs_env_path = conf.get_conf_dir();
         abs_env_path.push(env_path);
@@ -159,20 +179,19 @@ impl Env {
     }
 
     fn get_system_path(path: &String) -> String {
-        let conf = env::get_conf();
+        let conf = env::get_conf(&ConfigTrack::GLOBAL);
         let user_home = dirs::home_dir().unwrap().into_os_string().into_string().unwrap();
 
         return path.replace(&conf.user_home, &user_home);
     }
 
     fn copy(source: &PathBuf, destination: &PathBuf) {
+        let mut dest_dir = destination.clone();
+        dest_dir.pop();
+        let _ = fs::create_dir_all(dest_dir.clone());
         if source.is_dir() {
             let mut options = dir::CopyOptions::new();
             options.overwrite = true;
-
-            let mut dest_dir = destination.clone();
-            dest_dir.pop();
-            let _ = fs::create_dir_all(dest_dir.clone());
 
             let mut from_paths = Vec::new();
             from_paths.push(source);

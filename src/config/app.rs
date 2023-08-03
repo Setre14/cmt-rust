@@ -3,20 +3,23 @@ use std::process::{Command, Stdio};
 use std::path::PathBuf;
 use dirs::config_dir;
 use std::fs;
+use std::str::FromStr;
 
 use crate::base;
+use crate::config::config_track::ConfigTrack;
 
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AppConfig {
+    #[serde(default = "get_hostname")]
+    pub track: String,
+    #[serde(default = "get_default_debug_level")]
+    pub debug_level: u8,
     #[serde(default)]
     pub git_config_dir: String,
     #[serde(default)]
     pub git_clone_url: String,
-    #[serde(default)]
+    #[serde(default = "get_hostname")]
     pub git_branch: String,
-    #[serde(default = "get_default_debug_level")]
-    pub debug_level: u8,
 }
 
 impl Default for AppConfig {
@@ -24,27 +27,66 @@ impl Default for AppConfig {
         AppConfig {
             git_config_dir: get_default_git_config_dir(),
             git_clone_url: "".to_string(),
-            git_branch: get_default_git_branch(),
+            git_branch: get_hostname(),
             debug_level: get_default_debug_level(),
+            track: get_hostname()
+        }
+    }
+}
+
+impl base::StringAccessable for AppConfig {
+    fn get_string(&self, field_string: &str) -> Result<&String, String> {
+        match field_string {
+            "git_config_dir" => Ok(&self.git_config_dir),
+            "git_clone_url" => Ok(&self.git_clone_url),
+            "track" => Ok(&self.track),
+            _ => Err(format!("invalid field name to get '{}'", field_string))
+        }
+    }
+
+    fn get_vec(&self, field_string: &str) -> Result<&Vec<String>, String> {
+        match field_string {
+            _ => Err(format!("invalid field name to get '{}'", field_string))
+        }
+    }
+
+    fn get_u8(&self, field_string: &str) -> Result<&u8, String> {
+        match field_string {
+            "debug_level" => Ok(&self.debug_level),
+            _ => Err(format!("invalid field name to get '{}'", field_string))
         }
     }
 }
 
 impl base::ConfigReader for AppConfig {
-    fn get_conf_name(&self) -> String {
-        return "app.json".to_string();
-    }
     fn get_conf_dir(&self) -> PathBuf {
         let mut conf_dir = config_dir().expect("Could not get config dir");
         conf_dir.push("cmt-rust");
+        conf_dir.push("app");
         let _ = fs::create_dir_all(conf_dir.clone());
     
         return conf_dir;
     }
+
+    fn get_track(&self) -> ConfigTrack {
+        return ConfigTrack::from_str(&self.track).unwrap();
+    }
+
+    fn set_track(&mut self, track: &ConfigTrack) {
+        self.track = track.to_string();
+    }
+
+    fn merge<T: base::StringAccessable + Clone + std::fmt::Debug>(&mut self, other: T) {
+        self.git_config_dir = other.get_string("git_config_dir").unwrap().to_string();
+        self.git_clone_url = other.get_string("git_clone_url").unwrap().to_string();
+        self.debug_level = other.get_u8("debug_level").unwrap().clone();
+        self.track = other.get_string("track").unwrap().to_string();
+        
+    }
 }
 
 pub fn get_conf() -> AppConfig {
-    return base::get_conf(AppConfig { ..Default::default() });
+    return base::get_conf(&ConfigTrack::GLOBAL, AppConfig { ..Default::default() });
 }
 
 fn get_default_git_config_dir() -> String {
@@ -58,7 +100,7 @@ fn get_default_git_config_dir() -> String {
     return default_git_config_dir.into_os_string().into_string().unwrap();
 }
 
-fn get_default_git_branch() -> String {
+fn get_hostname() -> String {
     let output = Command::new("hostname")
         .stdout(Stdio::piped())
         .output()

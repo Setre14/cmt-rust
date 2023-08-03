@@ -1,13 +1,3 @@
-extern crate clap;
-extern crate dirs;
-extern crate serde;
-extern crate fs_extra;
-extern crate log;
-extern crate stderrlog;
-
-// use log;
-// use stderrlog;
-
 mod config;
 mod git_config;
 mod util;
@@ -54,6 +44,10 @@ enum Command {
         #[arg(short, long)]
         branch: Option<String>,
 
+        /// Branch to checkout otherwise default branch is used
+        #[arg(short, long)]
+        track: Option<String>,
+
         /// Remove folder if destination already exists
         #[arg(short, long)]
         force: bool,
@@ -99,8 +93,8 @@ fn main() {
         .unwrap();
     
     match &cli.command {
-        Some(Command::Init { url, dest, branch, force }) => {
-            git_config::init(url, dest, branch, *force);
+        Some(Command::Init { url, dest, branch, track, force }) => {
+            git_config::init(url, dest, branch, track, *force);
         },
         Some(Command::Config {command}) => {
             git_config::handle_command(command)

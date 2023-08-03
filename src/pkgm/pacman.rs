@@ -1,6 +1,7 @@
 use crate::util::exec;
 use crate::config::pkgm;
 use crate::git_config;
+use crate::config::config_track;
 
 use clap::{Subcommand};
 
@@ -11,6 +12,10 @@ pub enum Command {
     Sync {
         /// Package to install
         package: String,
+
+        /// Install package globally
+        #[arg(short, long)]
+        global: bool,
     },
 
     /// Remove a package
@@ -18,6 +23,10 @@ pub enum Command {
     Remove {
         /// Package to remove
         package: String,
+
+        /// Install package globally
+        #[arg(short, long)]
+        global: bool,
     },
 
     /// Update all packages
@@ -33,11 +42,11 @@ pub struct Pacman {
 impl Pacman {
     pub fn handle_command(command: &Command) {
         match command {
-            Command::Sync {package} => {
-                Self::sync(package);
+            Command::Sync {package, global} => {
+                Self::sync(package, global);
             },
-            Command::Remove {package} => {
-                Self::remove(package);
+            Command::Remove {package, global} => {
+                Self::remove(package, global);
             },
             Command::Update {} => {
                 Self::update();
@@ -45,9 +54,9 @@ impl Pacman {
         }
     }
 
-    pub fn sync(package: &String) 
+    pub fn sync(package: &String, global: &bool) 
     {
-        let mut pkgm_conf = pkgm::get_conf(pkgm::Pkgm::PACMAN);
+        let mut pkgm_conf = pkgm::get_conf(&pkgm::Pkgm::PACMAN, &config_track::bool_to_track(global));
 
         let command = ["pacman", "-S", package];    
         let result = exec::status("sudo", command);
@@ -58,9 +67,9 @@ impl Pacman {
         }
     }
 
-    pub fn remove(package: &String) 
+    pub fn remove(package: &String, global: &bool) 
     {
-        let mut pkgm_conf = pkgm::get_conf(pkgm::Pkgm::PACMAN);
+        let mut pkgm_conf = pkgm::get_conf(&pkgm::Pkgm::PACMAN, &config_track::bool_to_track(global));
 
         let command = ["pacman", "-R", package];
         let result = exec::status("sudo", command);

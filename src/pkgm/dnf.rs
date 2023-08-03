@@ -1,6 +1,7 @@
 use crate::util::exec;
 use crate::config::pkgm;
 use crate::git_config;
+use crate::config::config_track;
 
 use clap::{Subcommand};
 
@@ -10,12 +11,20 @@ pub enum Command {
     Install {
         /// Package to install
         package: String,
+
+        /// Install package globally
+        #[arg(short, long)]
+        global: bool,
     },
 
     /// Remove a package
     Remove {
         /// Package to remove
         package: String,
+
+        /// Remove package globally
+        #[arg(short, long)]
+        global: bool,
     },
 
     /// Update all packages
@@ -30,11 +39,11 @@ pub struct Dnf {
 impl Dnf {
     pub fn handle_command(command: &Command) {
         match command {
-            Command::Install {package} => {
-                Self::install(package);
+            Command::Install {package, global} => {
+                Self::install(package, global);
             },
-            Command::Remove {package} => {
-                Self::remove(package);
+            Command::Remove {package, global} => {
+                Self::remove(package, global);
             },
             Command::Upgrade {} => {
                 Self::upgrade();
@@ -42,9 +51,11 @@ impl Dnf {
         }
     }
 
-    pub fn install(package: &String) 
+    pub fn install(package: &String, global: &bool) 
     {
-        let mut pkgm_conf = pkgm::get_conf(pkgm::Pkgm::DNF);
+        let mut pkgm_conf = pkgm::get_conf(&pkgm::Pkgm::DNF, &config_track::bool_to_track(global));
+
+        log::info!("pkgm_conf: {:?}", pkgm_conf.clone());
 
         let command = ["dnf", "install", package];    
         let result = exec::status("sudo", command);
@@ -55,9 +66,9 @@ impl Dnf {
         }
     }
 
-    pub fn remove(package: &String) 
+    pub fn remove(package: &String, global: &bool) 
     {
-        let mut pkgm_conf = pkgm::get_conf(pkgm::Pkgm::DNF);
+        let mut pkgm_conf = pkgm::get_conf(&pkgm::Pkgm::DNF, &config_track::bool_to_track(global));
 
         let command = ["dnf", "install", package];
         let result = exec::status("sudo", command);
