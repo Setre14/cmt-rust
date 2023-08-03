@@ -127,12 +127,12 @@ impl Default for Pkgm {
 // }
 
 pub fn get_conf(pkgm: &Pkgm, track: &ConfigTrack) -> PkgmConfig {
-    return config_reader::get_conf(&track, PkgmConfig { pkgm: pkgm.to_string(), ..Default::default() });
+    return config_reader::get_conf(&track, &mut PkgmConfig { pkgm: pkgm.to_string(), ..Default::default() });
 }
 
 #[allow(dead_code)]
 pub fn get_combined_conf(pkgm: &Pkgm) -> PkgmConfig {
-    return config_reader::get_combined_conf(PkgmConfig { pkgm: pkgm.to_string(), ..Default::default() });
+    return config_reader::get_combined_conf(&mut PkgmConfig { pkgm: pkgm.to_string(), ..Default::default() });
 }
 
 fn merge_vec(a: &mut Vec<String>, b: &Vec<String>) {

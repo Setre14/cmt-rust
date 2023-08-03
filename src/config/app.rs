@@ -88,7 +88,7 @@ impl ConfigReader for AppConfig {
 }
 
 pub fn get_conf() -> AppConfig {
-    return config_reader::get_conf(&ConfigTrack::GLOBAL, AppConfig { ..Default::default() });
+    return config_reader::get_conf(&ConfigTrack::GLOBAL, &mut AppConfig { ..Default::default() });
 }
 
 fn get_default_git_config_dir() -> String {

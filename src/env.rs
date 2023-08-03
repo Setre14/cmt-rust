@@ -111,7 +111,9 @@ impl Env {
         let abs_env_path = Self::get_abs_env_path(&env_path);
         log::info!("Abs env path: {:#?}", abs_env_path.clone());
         
-        if abs_env_path.exists() {
+        let removed = conf.remove_path(&env_path);
+
+        if removed && abs_env_path.exists() {
             if abs_path.is_dir() {
                 let result = fs::remove_dir_all(abs_env_path);
                 log::info!("Result: {:#?}", result);
@@ -121,7 +123,6 @@ impl Env {
             }
         }
 
-        conf.remove_path(&env_path);
         git_config::update(&Some(format!("Env: Remove path '{}'", env_path)));
     }
 

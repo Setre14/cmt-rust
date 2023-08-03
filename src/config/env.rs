@@ -100,18 +100,19 @@ impl EnvConfig {
         config_reader::save_conf(self);
     }
 
-    pub fn remove_path(&mut self, path: &String) {
-        ConfigUtil::remove_from_list(&mut self.paths, path);
+    pub fn remove_path(&mut self, path: &String) -> bool {
+        let removed = ConfigUtil::remove_from_list(&mut self.paths, path);
         config_reader::save_conf(self);
+        return removed;
     }
 }
 
 pub fn get_conf(track: &ConfigTrack) -> EnvConfig {
-    return config_reader::get_conf(track, EnvConfig { ..Default::default() });
+    return config_reader::get_conf(track, &mut EnvConfig { ..Default::default() });
 }
 
 pub fn get_combined_conf() -> EnvConfig {
-    return config_reader::get_combined_conf(EnvConfig { ..Default::default() });
+    return config_reader::get_combined_conf(&mut EnvConfig { ..Default::default() });
 }
 
 fn merge_vec(a: &mut Vec<String>, b: &Vec<String>) {

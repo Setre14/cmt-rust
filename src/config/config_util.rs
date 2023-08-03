@@ -20,12 +20,15 @@ impl ConfigUtil {
         list.sort();
     }
     
-    pub fn remove_from_list(list: &mut Vec<String>, item: &String) {
-        if list.contains(item) {
+    pub fn remove_from_list(list: &mut Vec<String>, item: &String) -> bool {
+        let contains = list.contains(item);
+        if contains {
             let index = list.iter().position(|x| *x == item.to_string()).unwrap();
             list.remove(index);
         }
         list.sort();
+
+        return contains;
     }
 }
 

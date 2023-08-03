@@ -13,11 +13,11 @@ use crate::config::string_accessable::StringAccessable;
 pub trait ConfigReader {
     fn get_conf_dir(&self) -> PathBuf;
     
-    fn get_conf_file(&self, track: &ConfigTrack) -> PathBuf {   
+    fn get_conf_file(&self) -> PathBuf {   
         let mut conf_buf = self.get_conf_dir();
         conf_buf.push(self.get_conf_dir());
 
-        let filename = match track {
+        let filename = match self.get_track() {
             ConfigTrack::GLOBAL => "global".to_string(),
             ConfigTrack::SYSTEM => ConfigUtil::get_hostname(),
         };
@@ -33,14 +33,15 @@ pub trait ConfigReader {
     fn merge<T: StringAccessable + Clone + std::fmt::Debug>(&mut self, other: T);
 }
 
-pub fn get_conf<T>(track: &ConfigTrack, default: T) -> T
+pub fn get_conf<T>(track: &ConfigTrack, default: &mut T) -> T
 where 
-    T: Serialize + de::DeserializeOwned + ConfigReader,
+    T: Serialize + de::DeserializeOwned + ConfigReader + Clone,
 {
-    let conf_buf = default.get_conf_file(track);
+    default.set_track(track);
+    let conf_buf = default.get_conf_file();
     let conf_file = conf_buf.as_path();
 
-    let mut config: T;
+    let mut config = default.clone();
 
     if conf_file.exists() {
         log::debug!("Load conf_file: {:?}", conf_file.clone());
@@ -50,22 +51,21 @@ where
         config = serde_json::from_reader(reader).expect("Could not descerialize app conf");
     } else {
         log::debug!("conf_file {:?}, does not exits. Use default", conf_file.clone());
-        config = default;
+        // config = default;
     }
     config.set_track(track);
     
     return config;
 }
 
-pub fn get_combined_conf<T>(default: T) -> T 
+pub fn get_combined_conf<T>(default: &mut T) -> T 
 where 
     T: Serialize + de::DeserializeOwned + ConfigReader + std::fmt::Debug + Clone + StringAccessable,
 {
     let mut combined_conf = default.clone();
 
     for track in ConfigTrack::iter() {
-        let conf = get_conf(&track, default.clone());
-        combined_conf.merge(conf.clone());
+        combined_conf.merge(get_conf(&track, default));
     }
 
     log::debug!("combined_conf: {:?}", combined_conf.clone());
@@ -74,7 +74,7 @@ where
 }
 
 pub fn save_conf<T: Serialize + ConfigReader>(conf: &T) {
-    let conf_file = conf.get_conf_file(&conf.get_track());
+    let conf_file = conf.get_conf_file();
 
     let file = OpenOptions::new()
         .create(true)
