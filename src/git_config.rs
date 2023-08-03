@@ -2,9 +2,9 @@ use std::path::Path;
 use std::fs;
 use clap::{Subcommand};
 
-use crate::config::app;
-use crate::config::env;
-use crate::config::pkgm;
+use crate::config::app_config;
+use crate::config::env_config;
+use crate::config::pkgm_config;
 use crate::util::exec;
 use crate::config::config_reader;
 
@@ -69,7 +69,7 @@ pub fn handle_command(command: &Command) {
 }
 
 pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, track: &Option<String>, force: bool) {
-    let mut app_conf = app::get_conf();
+    let mut app_conf = app_config::get_conf();
 
     let git_config_dir = dest.clone().unwrap_or(app_conf.git_config_dir.clone());
     let git_branch = branch.clone().unwrap_or(app_conf.git_branch.clone());
@@ -103,7 +103,7 @@ pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, track:
 }
 
 pub fn update(message: &Option<String>) {
-    let app_conf = app::get_conf();
+    let app_conf = app_config::get_conf();
 
     let commit_message = message.clone().unwrap_or("Cmt: Automatic update".to_string());
 
@@ -117,12 +117,12 @@ pub fn update(message: &Option<String>) {
 }
 
 pub fn cleanup() {
-    env::cleanup();
-    pkgm::cleanup();
+    env_config::cleanup();
+    pkgm_config::cleanup();
 }
 
 pub fn open_code() {
-    let app_conf = app::get_conf();
+    let app_conf = app_config::get_conf();
     let git_config_dir = app_conf.git_config_dir;
 
     exec::status("code", [git_config_dir.as_str()]);
@@ -130,7 +130,7 @@ pub fn open_code() {
 
 
 pub fn open_nvim() {
-    let app_conf = app::get_conf();
+    let app_conf = app_config::get_conf();
     let git_config_dir = app_conf.git_config_dir;
 
     exec::status("nvim", [git_config_dir.as_str()]);

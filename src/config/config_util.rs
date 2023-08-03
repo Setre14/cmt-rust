@@ -30,6 +30,14 @@ impl ConfigUtil {
 
         return contains;
     }
+
+    pub fn merge_vec(a: &mut Vec<String>, b: &Vec<String>) {
+        for item in b {
+            if !a.contains(&item) {
+                a.push(item.clone().to_string());
+            }
+        } 
+    }
 }
 
     

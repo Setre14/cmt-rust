@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use std::fs;
 use std::str::FromStr;
 
-use crate::config::app;
+use crate::config::app_config;
 use crate::config::config_track::ConfigTrack;
 use crate::config::config_reader::ConfigReader;
 use crate::config::config_util::ConfigUtil;
@@ -19,15 +19,6 @@ pub struct EnvConfig {
     #[serde(default)]
     pub paths: Vec<String>,
 }
-
-// impl Default for EnvConfig {
-//     fn default() -> Self { 
-//         EnvConfig {
-//             user_home: get_user_home(),
-//             paths: Vec::new(),
-//         }
-//     }
-// }
 
 fn get_user_home() -> String {
     return "user-home".to_string();
@@ -56,12 +47,8 @@ impl StringAccessable for EnvConfig {
 }
 
 impl ConfigReader for EnvConfig {
-    // fn get_conf_name(&self) -> String {
-    //     return "env".to_string();
-    // }
-
     fn get_conf_dir(&self) -> PathBuf {
-        let app_conf = app::get_conf();
+        let app_conf = app_config::get_conf();
 
         let mut conf_dir = PathBuf::new();
         conf_dir.push(app_conf.git_config_dir);
@@ -83,7 +70,7 @@ impl ConfigReader for EnvConfig {
         self.user_home = other.get_string("user_home").unwrap().to_string();
 
         let paths = other.get_vec("paths").unwrap();
-        merge_vec(&mut self.paths, paths);
+        ConfigUtil::merge_vec(&mut self.paths, paths);
     }
 }
 
@@ -113,14 +100,6 @@ pub fn get_conf(track: &ConfigTrack) -> EnvConfig {
 
 pub fn get_combined_conf() -> EnvConfig {
     return config_reader::get_combined_conf(&mut EnvConfig { ..Default::default() });
-}
-
-fn merge_vec(a: &mut Vec<String>, b: &Vec<String>) {
-    for item in b {
-        if !a.contains(&item) {
-            a.push(item.clone().to_string());
-        }
-    } 
 }
 
 pub fn cleanup() {

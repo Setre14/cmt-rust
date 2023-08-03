@@ -1,5 +1,6 @@
 use crate::util::exec;
-use crate::config::pkgm;
+use crate::config::pkgm_config;
+use crate::config::package_manager::PackageManager;
 use crate::git_config;
 use crate::config::config_track;
 
@@ -56,7 +57,7 @@ impl Pacman {
 
     pub fn sync(package: &String, global: &bool) 
     {
-        let mut pkgm_conf = pkgm::get_conf(&pkgm::Pkgm::PACMAN, &config_track::bool_to_track(global));
+        let mut pkgm_conf = pkgm_config::get_conf(&PackageManager::PACMAN, &config_track::bool_to_track(global));
 
         let command = ["pacman", "-S", package];    
         let result = exec::status("sudo", command);
@@ -69,7 +70,7 @@ impl Pacman {
 
     pub fn remove(package: &String, global: &bool) 
     {
-        let mut pkgm_conf = pkgm::get_conf(&pkgm::Pkgm::PACMAN, &config_track::bool_to_track(global));
+        let mut pkgm_conf = pkgm_config::get_conf(&PackageManager::PACMAN, &config_track::bool_to_track(global));
 
         let command = ["pacman", "-R", package];
         let result = exec::status("sudo", command);

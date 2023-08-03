@@ -1,4 +1,4 @@
-use crate::config::env;
+use crate::config::env_config;
 use crate::git_config;
 use crate::config::config_track::ConfigTrack;
 use crate::config::config_reader::ConfigReader;
@@ -70,7 +70,7 @@ impl Env {
             false => ConfigTrack::SYSTEM,
         };
 
-        let mut conf = env::get_conf(&track);
+        let mut conf = env_config::get_conf(&track);
 
         let abs_path = Self::get_abs_path(&path);
         log::info!("Abs path: {:#?}", abs_path.clone());
@@ -86,7 +86,7 @@ impl Env {
     }
 
     pub fn apply() {
-        let conf = env::get_combined_conf();
+        let conf = env_config::get_combined_conf();
 
         for path in conf.paths {
             let abs_env_path = Self::get_abs_env_path(&path);
@@ -102,7 +102,7 @@ impl Env {
             false => ConfigTrack::SYSTEM,
         };
 
-        let mut conf = env::get_conf(&track);
+        let mut conf = env_config::get_conf(&track);
 
         let abs_path = Self::get_abs_path(&path);
         log::info!("Abs path: {:#?}", abs_path.clone());
@@ -127,7 +127,7 @@ impl Env {
     }
 
     pub fn sync() {
-        let conf = env::get_combined_conf();
+        let conf = env_config::get_combined_conf();
 
         for path in conf.paths {
             let abs_env_path = Self::get_abs_env_path(&path);
@@ -151,7 +151,7 @@ impl Env {
     }
 
     fn get_env_path(path: &PathBuf) -> String {
-        let conf = env::get_conf(&ConfigTrack::GLOBAL);
+        let conf = env_config::get_conf(&ConfigTrack::GLOBAL);
         let mut env_path = path.clone().into_os_string().into_string().unwrap();
         if env_path.starts_with("/") {
             env_path = (&env_path[1..]).to_string();
@@ -171,7 +171,7 @@ impl Env {
     }
 
     fn get_abs_env_path(env_path: &String) -> PathBuf {
-        let conf = env::get_conf(&ConfigTrack::GLOBAL);
+        let conf = env_config::get_conf(&ConfigTrack::GLOBAL);
 
         let mut abs_env_path = conf.get_conf_dir();
         abs_env_path.push(env_path);
@@ -180,7 +180,7 @@ impl Env {
     }
 
     fn get_system_path(path: &String) -> String {
-        let conf = env::get_conf(&ConfigTrack::GLOBAL);
+        let conf = env_config::get_conf(&ConfigTrack::GLOBAL);
         let user_home = dirs::home_dir().unwrap().into_os_string().into_string().unwrap();
 
         return path.replace(&conf.user_home, &user_home);

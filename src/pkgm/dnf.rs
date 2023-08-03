@@ -1,5 +1,6 @@
 use crate::util::exec;
-use crate::config::pkgm;
+use crate::config::pkgm_config;
+use crate::config::package_manager::PackageManager;
 use crate::git_config;
 use crate::config::config_track;
 
@@ -53,7 +54,7 @@ impl Dnf {
 
     pub fn install(package: &String, global: &bool) 
     {
-        let mut pkgm_conf = pkgm::get_conf(&pkgm::Pkgm::DNF, &config_track::bool_to_track(global));
+        let mut pkgm_conf = pkgm_config::get_conf(&PackageManager::DNF, &config_track::bool_to_track(global));
 
         log::info!("pkgm_conf: {:?}", pkgm_conf.clone());
 
@@ -68,7 +69,7 @@ impl Dnf {
 
     pub fn remove(package: &String, global: &bool) 
     {
-        let mut pkgm_conf = pkgm::get_conf(&pkgm::Pkgm::DNF, &config_track::bool_to_track(global));
+        let mut pkgm_conf = pkgm_config::get_conf(&PackageManager::DNF, &config_track::bool_to_track(global));
 
         let command = ["dnf", "install", package];
         let result = exec::status("sudo", command);

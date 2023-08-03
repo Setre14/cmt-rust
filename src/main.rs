@@ -6,8 +6,7 @@ mod env;
 
 use clap::{Parser, Subcommand};
 
-use config::app;
-// use env;
+use config::app_config;
 use env::Env;
 use pkgm::dnf;
 use pkgm::dnf::Dnf;
@@ -78,7 +77,7 @@ enum Command {
 }
 
 fn main() {
-    let conf = app::get_conf();
+    let conf = app_config::get_conf();
 
     let cli = Cli::parse();
 

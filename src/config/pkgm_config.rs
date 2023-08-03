@@ -2,17 +2,16 @@ use serde::{Serialize, Deserialize};
 use std::path::PathBuf;
 use std::fs;
 use std::string::ToString;
-use strum_macros::Display;
 use std::str::FromStr;
-use strum_macros::EnumString;
-use strum::{EnumIter, IntoEnumIterator};
+use strum::{IntoEnumIterator};
 
-use crate::config::app;
+use crate::config::app_config;
 use crate::config::config_reader;
 use crate::config::config_reader::ConfigReader;
 use crate::config::config_track::ConfigTrack;
 use crate::config::config_util::ConfigUtil;
 use crate::config::string_accessable::StringAccessable;
+use crate::config::package_manager::PackageManager;
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct PkgmConfig {
@@ -53,12 +52,8 @@ impl StringAccessable for PkgmConfig {
 }
 
 impl ConfigReader for PkgmConfig {
-    // fn get_conf_name(&self) -> String {
-    //     return self.pkgm.to_string().to_lowercase();
-    // }
-
     fn get_conf_dir(&self) -> PathBuf {
-        let app_conf = app::get_conf();
+        let app_conf = app_config::get_conf();
 
         let mut conf_dir = PathBuf::new();
         conf_dir.push(app_conf.git_config_dir);
@@ -83,13 +78,13 @@ impl ConfigReader for PkgmConfig {
         log::debug!("Merge other: {:?}", other.clone());
 
         let repos = other.get_vec("repos").unwrap();
-        merge_vec(&mut self.repos, repos);
+        ConfigUtil::merge_vec(&mut self.repos, repos);
 
         let remotes = other.get_vec("remotes").unwrap();
-        merge_vec(&mut self.remotes, remotes);
+        ConfigUtil::merge_vec(&mut self.remotes, remotes);
         
         let packages = other.get_vec("packages").unwrap();
-        merge_vec(&mut self.packages, packages);
+        ConfigUtil::merge_vec(&mut self.packages, packages);
 
         log::debug!("Merge result: {:?}", self.clone());
     }
@@ -107,45 +102,18 @@ impl PkgmConfig {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Display, EnumString, EnumIter)]
-pub enum Pkgm {
-    PACMAN,
-    DNF
-}
-
-impl Default for Pkgm {
-    fn default() -> Self { Pkgm::PACMAN }
-}
-
-// impl fmt::Display for Pkgm {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         match self {
-//             Pkgm::PACMAN => write!(f, "pacman"),
-//             Pkgm::DNF => write!(f, "dnf"),
-//         }
-//     }
-// }
-
-pub fn get_conf(pkgm: &Pkgm, track: &ConfigTrack) -> PkgmConfig {
+pub fn get_conf(pkgm: &PackageManager, track: &ConfigTrack) -> PkgmConfig {
     return config_reader::get_conf(&track, &mut PkgmConfig { pkgm: pkgm.to_string(), ..Default::default() });
 }
 
 #[allow(dead_code)]
-pub fn get_combined_conf(pkgm: &Pkgm) -> PkgmConfig {
+pub fn get_combined_conf(pkgm: &PackageManager) -> PkgmConfig {
     return config_reader::get_combined_conf(&mut PkgmConfig { pkgm: pkgm.to_string(), ..Default::default() });
-}
-
-fn merge_vec(a: &mut Vec<String>, b: &Vec<String>) {
-    for item in b {
-        if !a.contains(&item) {
-            a.push(item.clone().to_string());
-        }
-    } 
 }
 
 pub fn cleanup() {
     
-    for pkgm in Pkgm::iter() {
+    for pkgm in PackageManager::iter() {
         let global_conf = get_conf(&pkgm, &ConfigTrack::GLOBAL);
         let mut system_conf = get_conf(&pkgm, &ConfigTrack::SYSTEM);
         // for repo in global_conf.repos {
