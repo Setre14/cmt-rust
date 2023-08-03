@@ -1,87 +1,23 @@
-use crate::util::exec;
-use crate::config::pkgm_config;
 use crate::config::package_manager::PackageManager;
-use crate::git_config;
-use crate::config::config_track;
-
-use clap::{Subcommand};
-
-#[derive(Subcommand)]
-pub enum Command {
-    /// Install a package
-    #[command(name = "-S")]
-    Sync {
-        /// Package to install
-        package: String,
-
-        /// Install package globally
-        #[arg(short, long)]
-        global: bool,
-    },
-
-    /// Remove a package
-    #[command(name = "-R")]
-    Remove {
-        /// Package to remove
-        package: String,
-
-        /// Install package globally
-        #[arg(short, long)]
-        global: bool,
-    },
-
-    /// Update all packages
-    #[command(name = "-Syu")]
-    Update {}
-
-}
+use crate::pkgm::pkgm::Pkgm;
+use crate::util::command_line::CommandLine;
 
 pub struct Pacman {
     
 }
 
-impl Pacman {
-    pub fn handle_command(command: &Command) {
-        match command {
-            Command::Sync {package, global} => {
-                Self::sync(package, global);
-            },
-            Command::Remove {package, global} => {
-                Self::remove(package, global);
-            },
-            Command::Update {} => {
-                Self::update();
-            }
-        }
+impl Pkgm for Pacman {
+    fn get_package_manager() -> PackageManager {
+        return PackageManager::PACMAN;
     }
 
-    pub fn sync(package: &String, global: &bool) 
-    {
-        let mut pkgm_conf = pkgm_config::get_conf(&PackageManager::PACMAN, &config_track::bool_to_track(global));
-
-        let command = ["pacman", "-S", package];    
-        let result = exec::status("sudo", command);
-    
-        if result {
-            pkgm_conf.add_package(package);
-            git_config::update(&Some(format!("Add package '{}'", package)));
-        }
+    fn install_command(package: &String) -> CommandLine {
+        return CommandLine::create("sudo", ["pacman", "-S", package].to_vec())
     }
-
-    pub fn remove(package: &String, global: &bool) 
-    {
-        let mut pkgm_conf = pkgm_config::get_conf(&PackageManager::PACMAN, &config_track::bool_to_track(global));
-
-        let command = ["pacman", "-R", package];
-        let result = exec::status("sudo", command);
-        
-        if result {
-            pkgm_conf.remove_package(package);
-            git_config::update(&Some(format!("Remove package '{}'", package)));
-        }
+    fn remove_command(package: &String) -> CommandLine {
+        return CommandLine::create("sudo", ["pacman", "-R", package].to_vec())
     }
-
-    pub fn update() {
-        let _result = exec::status("sudo", ["pacman", "-Syu"]);
+    fn upgrade_command() -> CommandLine {
+        return CommandLine::create("sudo", ["pacman", "-Syu"].to_vec())
     }
 }

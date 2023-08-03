@@ -8,10 +8,10 @@ use clap::{Parser, Subcommand};
 
 use config::app_config;
 use env::Env;
-use pkgm::dnf;
 use pkgm::dnf::Dnf;
-use pkgm::pacman;
+use pkgm::pkgm_command::PkgmCommand;
 use pkgm::pacman::Pacman;
+use pkgm::pkgm::Pkgm;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -66,13 +66,13 @@ enum Command {
     /// Install, remove and update dnf packages
     Dnf {
         #[command(subcommand)]
-        command: dnf::Command,
+        command: PkgmCommand,
     },
 
     /// Install, remove and update pacman packages
     Pacman {
         #[command(subcommand)]
-        command: pacman::Command,
+        command: PkgmCommand,
     },
 }
 

@@ -1,6 +1,7 @@
 use std::path::Path;
 use std::fs;
 use clap::{Subcommand};
+use crate::util::command_line::CommandLine;
 
 use crate::config::app_config;
 use crate::config::env_config;
@@ -86,12 +87,15 @@ pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, track:
         }
     }
 
-    exec::status("git", ["clone", url, &git_config_dir]);
+    let git_clone = CommandLine::create("git", ["clone", url, &git_config_dir].to_vec());
+    exec::status(&git_clone);
 
-    let result = exec::status_in_dir("git", ["checkout", &git_branch], &git_config_dir);
+    let git_checkout = CommandLine::create("git", ["checkout", &git_branch].to_vec());
+    let result = exec::status_in_dir(&git_checkout, &git_config_dir);
 
     if !result {
-        exec::status_in_dir("git", ["checkout", "-b", &git_branch], &git_config_dir);
+        let git_create_branch = CommandLine::create("git", ["checkout", "-b", &git_branch].to_vec());
+        exec::status_in_dir(&git_create_branch, &git_config_dir);
     } 
     
     app_conf.git_clone_url = url.clone();
@@ -109,10 +113,14 @@ pub fn update(message: &Option<String>) {
 
     log::debug!("Commit message for update: {}", commit_message);
 
-    exec::status_in_dir("git", ["add", "."], &app_conf.git_config_dir);
-    let result = exec::status_in_dir("git", ["commit", "-m", &commit_message], &app_conf.git_config_dir);
+    let git_add = CommandLine::create("git", ["add", "."].to_vec());
+    exec::status_in_dir(&git_add, &app_conf.git_config_dir);
+
+    let git_commit = CommandLine::create("git", ["commit", "-m", &commit_message].to_vec());
+    let result = exec::status_in_dir(&git_commit, &app_conf.git_config_dir);
     if result {
-        exec::status_in_dir("git", ["push"], &app_conf.git_config_dir);
+        let git_push = CommandLine::create("git", ["push"].to_vec());
+        exec::status_in_dir(&git_push, &app_conf.git_config_dir);
     }
 }
 
@@ -125,7 +133,8 @@ pub fn open_code() {
     let app_conf = app_config::get_conf();
     let git_config_dir = app_conf.git_config_dir;
 
-    exec::status("code", [git_config_dir.as_str()]);
+    let code = CommandLine::create("code", [git_config_dir.as_str()].to_vec());
+    exec::status(&code);
 }
 
 
@@ -133,7 +142,9 @@ pub fn open_nvim() {
     let app_conf = app_config::get_conf();
     let git_config_dir = app_conf.git_config_dir;
 
-    exec::status("nvim", [git_config_dir.as_str()]);
+
+    let nvim = CommandLine::create("nvim", [git_config_dir.as_str()].to_vec());
+    exec::status(&nvim);
 }
 
 // require 'thor'
