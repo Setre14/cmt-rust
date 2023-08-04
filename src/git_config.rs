@@ -6,7 +6,7 @@ use crate::util::command_line::CommandLine;
 use crate::config::app_config;
 use crate::config::env_config;
 use crate::config::pkgm_config;
-use crate::util::exec;
+use crate::util::exec::Exec;
 use crate::config::config_reader;
 
 #[derive(Subcommand)]
@@ -88,14 +88,14 @@ pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, track:
     }
 
     let git_clone = CommandLine::create("git", ["clone", url, &git_config_dir].to_vec());
-    exec::status(&git_clone);
+    Exec::status(&git_clone);
 
     let git_checkout = CommandLine::create("git", ["checkout", &git_branch].to_vec());
-    let result = exec::status_in_dir(&git_checkout, &git_config_dir);
+    let result = Exec::status_in_dir(&git_checkout, &git_config_dir);
 
     if !result {
         let git_create_branch = CommandLine::create("git", ["checkout", "-b", &git_branch].to_vec());
-        exec::status_in_dir(&git_create_branch, &git_config_dir);
+        Exec::status_in_dir(&git_create_branch, &git_config_dir);
     } 
     
     app_conf.git_clone_url = url.clone();
@@ -114,13 +114,13 @@ pub fn update(message: &Option<String>) {
     log::debug!("Commit message for update: {}", commit_message);
 
     let git_add = CommandLine::create("git", ["add", "."].to_vec());
-    exec::status_in_dir(&git_add, &app_conf.git_config_dir);
+    Exec::status_in_dir(&git_add, &app_conf.git_config_dir);
 
     let git_commit = CommandLine::create("git", ["commit", "-m", &commit_message].to_vec());
-    let result = exec::status_in_dir(&git_commit, &app_conf.git_config_dir);
+    let result = Exec::status_in_dir(&git_commit, &app_conf.git_config_dir);
     if result {
         let git_push = CommandLine::create("git", ["push"].to_vec());
-        exec::status_in_dir(&git_push, &app_conf.git_config_dir);
+        Exec::status_in_dir(&git_push, &app_conf.git_config_dir);
     }
 }
 
@@ -134,7 +134,7 @@ pub fn open_code() {
     let git_config_dir = app_conf.git_config_dir;
 
     let code = CommandLine::create("code", [git_config_dir.as_str()].to_vec());
-    exec::status(&code);
+    Exec::status(&code);
 }
 
 
@@ -144,7 +144,7 @@ pub fn open_nvim() {
 
 
     let nvim = CommandLine::create("nvim", [git_config_dir.as_str()].to_vec());
-    exec::status(&nvim);
+    Exec::status(&nvim);
 }
 
 // require 'thor'

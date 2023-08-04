@@ -1,4 +1,4 @@
-use crate::util::exec;
+use crate::util::exec::Exec;
 use crate::util::command_line::CommandLine;
 use crate::config::pkgm_config;
 use crate::config::package_manager::PackageManager;
@@ -31,7 +31,7 @@ pub trait Pkgm {
 
         log::info!("pkgm_conf: {:?}", pkgm_conf.clone());
 
-        let result = exec::status(&Self::install_command(package));
+        let result = Exec::status(&Self::install_command(package));
     
         if result {
             pkgm_conf.add_package(package);
@@ -44,7 +44,7 @@ pub trait Pkgm {
     {
         let mut pkgm_conf = pkgm_config::get_conf(&Self::get_package_manager(), &config_track::bool_to_track(global));
 
-        let result = exec::status(&Self::remove_command(package));
+        let result = Exec::status(&Self::remove_command(package));
         
         if result {
             pkgm_conf.remove_package(package);
@@ -54,6 +54,6 @@ pub trait Pkgm {
 
     fn upgrade_command() -> CommandLine;
     fn upgrade() {
-        let _result = exec::status(&Self::upgrade_command());
+        let _result = Exec::status(&Self::upgrade_command());
     }
 }
