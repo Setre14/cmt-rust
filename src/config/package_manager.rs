@@ -7,7 +7,8 @@ use strum::{EnumIter};
 #[derive(Serialize, Deserialize, Debug, Display, EnumString, EnumIter)]
 pub enum PackageManager {
     PACMAN,
-    DNF
+    DNF,
+    YAY
 }
 
 impl Default for PackageManager {

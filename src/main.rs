@@ -12,6 +12,7 @@ use pkgm::dnf::Dnf;
 use pkgm::pkgm_command::PkgmCommand;
 use pkgm::pacman::Pacman;
 use pkgm::pkgm::Pkgm;
+use pkgm::yay::Yay;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -74,6 +75,12 @@ enum Command {
         #[command(subcommand)]
         command: PkgmCommand,
     },
+
+    /// Install, remove and update yay packages
+    Yay {
+        #[command(subcommand)]
+        command: PkgmCommand,
+    },
 }
 
 fn main() {
@@ -102,6 +109,9 @@ fn main() {
         },
         Some(Command::Pacman {command}) => {
             Pacman::handle_command(command)
+        },
+        Some(Command::Yay {command}) => {
+            Yay::handle_command(command)
         },
         Some(Command::Dnf {command}) => {
             Dnf::handle_command(command)
