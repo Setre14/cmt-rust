@@ -23,3 +23,6 @@ stderrlog = "0.5.4"
 strum_macros = "0.25"
 strum = { version = "0.25", features = ["derive"] }
 
+[dev-dependencies]
+pretty_assertions = "1.4.0"
+
