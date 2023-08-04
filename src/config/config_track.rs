@@ -9,6 +9,7 @@ pub enum ConfigTrack {
     SYSTEM
 }
 
+#[allow(dead_code)]
 pub fn bool_to_track(global: &bool) -> ConfigTrack {
     return match global {
         true => ConfigTrack::GLOBAL,

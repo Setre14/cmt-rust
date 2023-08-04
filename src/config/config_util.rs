@@ -13,11 +13,14 @@ impl ConfigUtil {
         return stdout;
     }
 
-    pub fn add_to_list(list: &mut Vec<String>, item: &String) {
-        if !list.contains(item) {
+    pub fn add_to_list(list: &mut Vec<String>, item: &String) -> bool {
+        let contains = list.contains(item);
+        if !contains {
             list.push(item.clone().to_string());
         }
         list.sort();
+
+        return contains;
     }
     
     pub fn remove_from_list(list: &mut Vec<String>, item: &String) -> bool {

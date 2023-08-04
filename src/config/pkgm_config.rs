@@ -92,35 +92,41 @@ impl ConfigReader for PkgmConfig {
 
 impl PkgmConfig {
     #[allow(dead_code)]
-    pub fn add_remote(&mut self, remote: &String) {
-        ConfigUtil::add_to_list(&mut self.remotes, remote);
+    pub fn add_remote(&mut self, remote: &String) -> bool {
+        let added = ConfigUtil::add_to_list(&mut self.remotes, remote);
         config_reader::save_conf(self);
+        return added;
     }
 
-    pub fn remove_remote(&mut self, remote: &String) {
-        ConfigUtil::remove_from_list(&mut self.remotes, remote);
+    pub fn remove_remote(&mut self, remote: &String) -> bool {
+        let removed = ConfigUtil::remove_from_list(&mut self.remotes, remote);
         config_reader::save_conf(self);
+        return removed;
     }
 
     #[allow(dead_code)]
-    pub fn add_repo(&mut self, repo: &String) {
-        ConfigUtil::add_to_list(&mut self.repos, repo);
+    pub fn add_repo(&mut self, repo: &String) -> bool {
+        let added = ConfigUtil::add_to_list(&mut self.repos, repo);
         config_reader::save_conf(self);
+        return added;
     }
 
-    pub fn remove_repo(&mut self, repo: &String) {
-        ConfigUtil::remove_from_list(&mut self.repos, repo);
+    pub fn remove_repo(&mut self, repo: &String) -> bool {
+        let removed = ConfigUtil::remove_from_list(&mut self.repos, repo);
         config_reader::save_conf(self);
+        return removed;
     }
 
-    pub fn add_package(&mut self, package: &String) {
-        ConfigUtil::add_to_list(&mut self.packages, package);
+    pub fn add_package(&mut self, package: &String) -> bool {
+        let added = ConfigUtil::add_to_list(&mut self.packages, package);
         config_reader::save_conf(self);
+        return added;
     }
 
-    pub fn remove_package(&mut self, package: &String) {
-        ConfigUtil::remove_from_list(&mut self.packages, package);
+    pub fn remove_package(&mut self, package: &String) -> bool {
+        let removed = ConfigUtil::remove_from_list(&mut self.packages, package);
         config_reader::save_conf(self);
+        return removed;
     }
 }
 
