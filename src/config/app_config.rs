@@ -2,7 +2,6 @@ use serde::{Serialize, Deserialize};
 use std::path::PathBuf;
 use dirs::config_dir;
 use std::fs;
-use std::str::FromStr;
 
 use crate::config::config_reader;
 use crate::config::config_reader::ConfigReader;
@@ -71,7 +70,7 @@ impl ConfigReader for AppConfig {
     }
 
     fn get_track(&self) -> ConfigTrack {
-        return ConfigTrack::from_str(&self.track).unwrap();
+        return ConfigTrack::GLOBAL;
     }
 
     fn set_track(&mut self, track: &ConfigTrack) {

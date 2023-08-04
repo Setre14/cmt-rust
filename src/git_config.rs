@@ -79,7 +79,7 @@ pub fn init(url: &String, dest: &Option<String>, branch: &Option<String>, track:
     let mut app_conf = app_config::get_conf();
 
     let git_config_dir = dest.clone().unwrap_or(app_conf.git_config_dir.clone());
-    let git_branch = branch.clone().unwrap_or(app_conf.git_branch.clone());
+    let git_branch = branch.clone().unwrap_or("main".to_string());
     let config_track = track.clone().unwrap_or(app_conf.git_branch.clone());
 
     log::info!("git config init: {}, {}", git_config_dir, git_branch);
