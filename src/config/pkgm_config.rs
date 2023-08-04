@@ -91,6 +91,28 @@ impl ConfigReader for PkgmConfig {
 }
 
 impl PkgmConfig {
+    #[allow(dead_code)]
+    pub fn add_remote(&mut self, remote: &String) {
+        ConfigUtil::add_to_list(&mut self.remotes, remote);
+        config_reader::save_conf(self);
+    }
+
+    pub fn remove_remote(&mut self, remote: &String) {
+        ConfigUtil::remove_from_list(&mut self.remotes, remote);
+        config_reader::save_conf(self);
+    }
+
+    #[allow(dead_code)]
+    pub fn add_repo(&mut self, repo: &String) {
+        ConfigUtil::add_to_list(&mut self.repos, repo);
+        config_reader::save_conf(self);
+    }
+
+    pub fn remove_repo(&mut self, repo: &String) {
+        ConfigUtil::remove_from_list(&mut self.repos, repo);
+        config_reader::save_conf(self);
+    }
+
     pub fn add_package(&mut self, package: &String) {
         ConfigUtil::add_to_list(&mut self.packages, package);
         config_reader::save_conf(self);
@@ -112,17 +134,16 @@ pub fn get_combined_conf(pkgm: &PackageManager) -> PkgmConfig {
 }
 
 pub fn cleanup() {
-    
     for pkgm in PackageManager::iter() {
         let global_conf = get_conf(&pkgm, &ConfigTrack::GLOBAL);
         let mut system_conf = get_conf(&pkgm, &ConfigTrack::SYSTEM);
-        // for repo in global_conf.repos {
-        //     system_conf.remove_repos(&repo);
-        // }
+        for repo in global_conf.repos {
+            system_conf.remove_repo(&repo);
+        }
     
-        // for remote in global_conf.remotes {
-        //     system_conf.remove_remote(&remote);
-        // }
+        for remote in global_conf.remotes {
+            system_conf.remove_remote(&remote);
+        }
     
         for package in global_conf.packages {
             system_conf.remove_package(&package);

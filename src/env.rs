@@ -65,6 +65,7 @@ impl Env {
     }
 
     pub fn add(path: &String, global: &bool) {
+        git_config::pull();
         let track = match global {
             true => ConfigTrack::GLOBAL,
             false => ConfigTrack::SYSTEM,
@@ -86,6 +87,7 @@ impl Env {
     }
 
     pub fn apply() {
+        git_config::pull();
         let conf = env_config::get_combined_conf();
 
         for path in conf.paths {
@@ -97,6 +99,7 @@ impl Env {
     }
 
     pub fn remove(path: &String, global: &bool) {
+        git_config::pull();
         let track = match global {
             true => ConfigTrack::GLOBAL,
             false => ConfigTrack::SYSTEM,
@@ -127,6 +130,7 @@ impl Env {
     }
 
     pub fn sync() {
+        git_config::pull();
         let conf = env_config::get_combined_conf();
 
         for path in conf.paths {

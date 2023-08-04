@@ -27,6 +27,7 @@ pub trait Pkgm {
     fn install_command(package: &String) -> CommandLine;
     fn install(package: &String, global: &bool) 
     {
+        git_config::pull();
         let mut pkgm_conf = pkgm_config::get_conf(&Self::get_package_manager(), &config_track::bool_to_track(global));
 
         log::info!("pkgm_conf: {:?}", pkgm_conf.clone());
@@ -42,6 +43,7 @@ pub trait Pkgm {
     fn remove_command(package: &String) -> CommandLine;
     fn remove(package: &String, global: &bool) 
     {
+        git_config::pull();
         let mut pkgm_conf = pkgm_config::get_conf(&Self::get_package_manager(), &config_track::bool_to_track(global));
 
         let result = Exec::status(&Self::remove_command(package));

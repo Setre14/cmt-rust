@@ -40,6 +40,9 @@ pub enum Command {
         message: Option<String>,
     },
 
+    /// Pull latest changes from origin
+    Pull {},
+
     /// Remove duplicates in global and system config
     Cleanup {},
 
@@ -56,6 +59,9 @@ pub fn handle_command(command: &Command) {
         },
         Command::Update { message } => {
             update(message);
+        },
+        Command::Pull {} => {
+            pull();
         },
         Command::Cleanup {} => {
             cleanup();
@@ -121,6 +127,18 @@ pub fn update(message: &Option<String>) {
     if result {
         let git_push = CommandLine::create("git", ["push"].to_vec());
         Exec::status_in_dir(&git_push, &app_conf.git_config_dir);
+    }
+}
+
+pub fn pull() {
+    let app_conf = app_config::get_conf();
+
+    let git_add = CommandLine::create("git", ["pull"].to_vec());
+    let result = Exec::status_in_dir(&git_add, &app_conf.git_config_dir);
+
+    if !result {
+        log::error!("Could not pull {}", &app_conf.git_config_dir);
+        panic!();
     }
 }
 
