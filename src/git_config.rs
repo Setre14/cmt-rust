@@ -130,6 +130,14 @@ pub fn update(message: &Option<String>) {
     }
 }
 
+pub fn auto_update(message: &Option<String>) {
+    let app_conf = app_config::get_conf();
+
+    if app_conf.git_auto_sync {
+        update(message);
+    }
+}
+
 pub fn pull() {
     let app_conf = app_config::get_conf();
 
@@ -139,6 +147,14 @@ pub fn pull() {
     if !result {
         log::error!("Could not pull {}", &app_conf.git_config_dir);
         panic!();
+    }
+}
+
+pub fn auto_pull() {
+    let app_conf = app_config::get_conf();
+
+    if app_conf.git_auto_sync {
+        pull();
     }
 }
 

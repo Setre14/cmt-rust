@@ -35,8 +35,9 @@ pub trait ConfigReader {
 
 pub fn get_conf<T>(track: &ConfigTrack, default: &mut T) -> T
 where 
-    T: Serialize + de::DeserializeOwned + ConfigReader + Clone,
+    T: Serialize + de::DeserializeOwned + ConfigReader + Clone + std::fmt::Debug,
 {
+    log::debug!("Default conf: {:?}", default.clone());
     default.set_track(track);
     let conf_buf = default.get_conf_file();
     let conf_file = conf_buf.as_path();

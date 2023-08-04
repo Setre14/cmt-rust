@@ -10,7 +10,7 @@ use crate::config::config_util::ConfigUtil;
 use crate::config::string_accessable::StringAccessable;
 use crate::config::config_reader;
 
-#[derive(Serialize, Deserialize, Default, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EnvConfig {
     #[serde(default)]
     pub track: String,
@@ -18,6 +18,16 @@ pub struct EnvConfig {
     pub user_home: String,
     #[serde(default)]
     pub paths: Vec<String>,
+}
+
+impl Default for EnvConfig {
+    fn default() -> Self { 
+        EnvConfig {
+            track: "".to_string(),
+            user_home: get_user_home(),
+            paths: Vec::new(),
+        }
+    }
 }
 
 fn get_user_home() -> String {

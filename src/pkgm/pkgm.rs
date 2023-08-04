@@ -27,7 +27,7 @@ pub trait Pkgm {
     fn install_command(package: &String) -> CommandLine;
     fn install(package: &String, global: &bool) 
     {
-        git_config::pull();
+        git_config::auto_pull();
         let mut global_pkgm_conf = pkgm_config::get_conf(&Self::get_package_manager(), &ConfigTrack::GLOBAL);
         let mut system_pkgm_conf = pkgm_config::get_conf(&Self::get_package_manager(), &ConfigTrack::SYSTEM);
 
@@ -43,7 +43,7 @@ pub trait Pkgm {
         let result = Exec::status(&Self::install_command(package));
     
         if result {
-            git_config::update(&Some(format!("Add package '{}'", package)));
+            git_config::auto_update(&Some(format!("Add package '{}'", package)));
         } else {
             if added {
                 if *global {
@@ -58,7 +58,7 @@ pub trait Pkgm {
     fn remove_command(package: &String) -> CommandLine;
     fn remove(package: &String, global: &bool) 
     {
-        git_config::pull();
+        git_config::auto_pull();
         let mut global_pkgm_conf = pkgm_config::get_conf(&Self::get_package_manager(), &ConfigTrack::GLOBAL);
         let mut system_pkgm_conf = pkgm_config::get_conf(&Self::get_package_manager(), &ConfigTrack::SYSTEM);
 
@@ -76,7 +76,7 @@ pub trait Pkgm {
         } else {
             system_pkgm_conf.remove_package(package);
         }
-        git_config::update(&Some(format!("Remove package '{}'", package)));
+        git_config::auto_update(&Some(format!("Remove package '{}'", package)));
     }
 
     fn upgrade_command() -> CommandLine;

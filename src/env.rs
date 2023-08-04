@@ -65,7 +65,7 @@ impl Env {
     }
 
     pub fn add(path: &String, global: &bool) {
-        git_config::pull();
+        git_config::auto_pull();
         let track = match global {
             true => ConfigTrack::GLOBAL,
             false => ConfigTrack::SYSTEM,
@@ -83,11 +83,11 @@ impl Env {
         Self::copy(&abs_path, &PathBuf::from(abs_env_path));
 
         conf.add_path(&env_path);
-        git_config::update(&Some(format!("Env: Add path '{}'", env_path)));
+        git_config::auto_update(&Some(format!("Env: Add path '{}'", env_path)));
     }
 
     pub fn apply() {
-        git_config::pull();
+        git_config::auto_pull();
         let conf = env_config::get_combined_conf();
 
         for path in conf.paths {
@@ -99,7 +99,7 @@ impl Env {
     }
 
     pub fn remove(path: &String, global: &bool) {
-        git_config::pull();
+        git_config::auto_pull();
         let track = match global {
             true => ConfigTrack::GLOBAL,
             false => ConfigTrack::SYSTEM,
@@ -126,11 +126,11 @@ impl Env {
             }
         }
 
-        git_config::update(&Some(format!("Env: Remove path '{}'", env_path)));
+        git_config::auto_update(&Some(format!("Env: Remove path '{}'", env_path)));
     }
 
     pub fn sync() {
-        git_config::pull();
+        git_config::auto_pull();
         let conf = env_config::get_combined_conf();
 
         for path in conf.paths {
@@ -139,7 +139,7 @@ impl Env {
 
             Self::copy(&PathBuf::from(system_path), &abs_env_path)
         }
-        git_config::update(&Some(format!("Env: sync")));
+        git_config::auto_update(&Some(format!("Env: sync")));
     }
 
     fn get_abs_path(path: &str) -> PathBuf {

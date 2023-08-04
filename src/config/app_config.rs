@@ -15,12 +15,14 @@ pub struct AppConfig {
     pub track: String,
     #[serde(default = "get_default_debug_level")]
     pub debug_level: u8,
-    #[serde(default)]
+    #[serde(default = "get_default_git_config_dir")]
     pub git_config_dir: String,
     #[serde(default)]
     pub git_clone_url: String,
     #[serde(default = "ConfigUtil::get_hostname")]
     pub git_branch: String,
+    #[serde(default = "get_default_git_auto_sync")]
+    pub git_auto_sync: bool,
 }
 
 impl Default for AppConfig {
@@ -30,7 +32,8 @@ impl Default for AppConfig {
             git_clone_url: "".to_string(),
             git_branch: ConfigUtil::get_hostname(),
             debug_level: get_default_debug_level(),
-            track: ConfigUtil::get_hostname()
+            track: ConfigUtil::get_hostname(),
+            git_auto_sync: get_default_git_auto_sync()
         }
     }
 }
@@ -103,4 +106,8 @@ fn get_default_git_config_dir() -> String {
 
 fn get_default_debug_level() -> u8 {
     return 2;
+}
+
+fn get_default_git_auto_sync() -> bool {
+    return true;
 }
