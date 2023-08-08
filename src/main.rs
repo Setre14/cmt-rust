@@ -1,11 +1,14 @@
 pub mod config;
 pub mod util;
+pub mod env;
 
 use clap::{Parser, Subcommand};
 
 use config::params::config_params_init::ConfigParamsInit;
 use config::params::config_params_update::ConfigParamsUpdate;
 use config::config::Config;
+use env::cli::env_cli::EnvCli;
+use env::cli::env_cli_command::EnvCliCommand;
 use config::pojo::local_config::LocalConfig;
 use config::pojo::base_config::BaseConfig;
 
@@ -38,10 +41,10 @@ enum Command {
         params: ConfigParamsUpdate,
     },
 
-//     Env {
-//         #[command(subcommand)]
-//         command: EnvCliCommand,
-//     }
+    Env {
+        #[command(subcommand)]
+        command: EnvCliCommand,
+    }
 }
 
 
@@ -67,10 +70,10 @@ fn main() {
         Some(Command::Update { params }) => {
             Config::update(params);
         },
-        // Some(Command::Env { command }) => {
-        //     EnvCli::handle_command(command)
-        //     // git_config::init(url, dest, branch, track, *force);
-        // }
+        Some(Command::Env { command }) => {
+            EnvCli::handle_command(command)
+            // git_config::init(url, dest, branch, track, *force);
+        }
         None => {} 
     }
 }
