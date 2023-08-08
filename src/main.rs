@@ -1,18 +1,15 @@
-mod config;
-mod git_config;
-mod util;
-mod pkgm;
-mod env;
+pub mod config;
+// pub mod env;
+pub mod util;
+pub mod settings;
 
 use clap::{Parser, Subcommand};
 
-use config::app_config;
-use env::Env;
-use pkgm::dnf::Dnf;
-use pkgm::pkgm_command::PkgmCommand;
-use pkgm::pacman::Pacman;
-use pkgm::pkgm::Pkgm;
-use pkgm::yay::Yay;
+use config::cli::config_cli::{ConfigCli};
+use config::cli::config_cli_command::{ConfigCliCommand};
+// use env::env_cli::{EnvCli, EnvCliCommand};
+use config::config_settings::ConfigSettings;
+use settings::base_settings::BaseSettings;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -21,101 +18,51 @@ struct Cli {
     #[arg(short, long)]
     quiet: bool,
     /// Verbose mode (-v, -vv, -vvv, etc)
-    #[arg(short, long, action = clap::ArgAction::Count)]
+    #[arg(short, long, action = clap::ArgAction::Count, global = true)]
     verbose: u8,
 
     #[command(subcommand)]
     command: Option<Command>,
 }
 
+
 #[derive(Subcommand)]
 enum Command {
-    /// Init app config and clone git config
-    Init {
-        /// Git clone url
-        url: String,
-
-        /// Destination for git clone, default: ~/.config/cmt-rust
-        #[arg(short, long)]
-        dest: Option<String>,
-
-        /// Branch to checkout otherwise default branch is used
-        #[arg(short, long)]
-        branch: Option<String>,
-
-        /// Branch to checkout otherwise default branch is used
-        #[arg(short, long)]
-        track: Option<String>,
-
-        /// Remove folder if destination already exists
-        #[arg(short, long)]
-        force: bool,
-    },
-
-    /// Interact with git config
     Config {
         #[command(subcommand)]
-        command: git_config::Command,
+        command: ConfigCliCommand,
     },
 
-    /// Add, remove and sync files and folders
-    Env {
-        #[command(subcommand)]
-        command: env::Command,
-    },
-
-    /// Install, remove and update dnf packages
-    Dnf {
-        #[command(subcommand)]
-        command: PkgmCommand,
-    },
-
-    /// Install, remove and update pacman packages
-    Pacman {
-        #[command(subcommand)]
-        command: PkgmCommand,
-    },
-
-    /// Install, remove and update yay packages
-    Yay {
-        #[command(subcommand)]
-        command: PkgmCommand,
-    },
+//     Env {
+//         #[command(subcommand)]
+//         command: EnvCliCommand,
+//     }
 }
 
+
 fn main() {
-    let conf = app_config::get_conf();
+    // let conf = app_config::get_settings();
+    let settings = ConfigSettings::get_settings();
 
     let cli = Cli::parse();
 
     stderrlog::new()
         .module(module_path!())
         .quiet(cli.quiet)
-        .verbosity((cli.verbose + conf.debug_level) as usize)
+        .verbosity((cli.verbose + settings.debug_level) as usize)
         .show_module_names(true)
         // .timestamp(stderrlog::Timestamp::Second)
         .init()
         .unwrap();
     
     match &cli.command {
-        Some(Command::Init { url, dest, branch, track, force }) => {
-            git_config::init(url, dest, branch, track, *force);
-        },
-        Some(Command::Config {command}) => {
-            git_config::handle_command(command)
-        },
-        Some(Command::Env {command}) => {
-            Env::handle_command(command)
-        },
-        Some(Command::Pacman {command}) => {
-            Pacman::handle_command(command)
-        },
-        Some(Command::Yay {command}) => {
-            Yay::handle_command(command)
-        },
-        Some(Command::Dnf {command}) => {
-            Dnf::handle_command(command)
-        },
-        None => {}
+        Some(Command::Config { command }) => {
+            ConfigCli::handle_command(command)
+        }
+        // Some(Command::Env { command }) => {
+        //     EnvCli::handle_command(command)
+        //     // git_config::init(url, dest, branch, track, *force);
+        // }
+        None => {} 
     }
 }

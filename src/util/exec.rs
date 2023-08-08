@@ -1,5 +1,4 @@
-use std::process::{Command};
-// use std::process::{Command, Stdio};
+use std::process::{Command, Stdio};
 use std::path::Path;
 use std::env;
 
@@ -29,6 +28,16 @@ impl Exec {
         log::debug!("Result: {:#?} {:#?}", status.success(), status);
     
         return status.success();
+    }
+
+    pub fn get_hostname() -> String {
+        let output = Command::new("hostname")
+            .stdout(Stdio::piped())
+            .output()
+            .unwrap();
+        let stdout = String::from_utf8(output.stdout).unwrap().replace("\n", "");
+    
+        return stdout;
     }
 }
 
