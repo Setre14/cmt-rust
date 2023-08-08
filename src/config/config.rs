@@ -23,7 +23,8 @@ impl Config {
             if params.force {
                 let _ = fs::remove_dir_all(Path::new(&git_config_dir));
             } else {
-                log::info!("dir exists");
+        let git_config_dir = params.dest.clone().unwrap_or(settings.git_config_dir.clone());
+                log::error!("Dir {} already exists", git_config_dir.clone());
                 std::process::exit(1);
             }
         }
