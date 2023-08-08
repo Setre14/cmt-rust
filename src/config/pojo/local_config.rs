@@ -1,45 +1,45 @@
 use serde::{Serialize, Deserialize};
 
-use crate::settings::base_settings::BaseSettings;
+use crate::config::pojo::base_config::BaseConfig;
 use crate::util::exec::Exec;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ConfigSettings {
-    #[serde(default = "ConfigSettings::get_default_debug_level")]
+pub struct LocalConfig {
+    #[serde(default = "LocalConfig::get_default_debug_level")]
     pub debug_level: u8,
-    #[serde(default = "ConfigSettings::get_default_git_auto_sync")]
+    #[serde(default = "LocalConfig::get_default_git_auto_sync")]
     pub git_auto_sync: bool,
-    #[serde(default = "ConfigSettings::get_default_git_config_dir")]
+    #[serde(default = "LocalConfig::get_default_git_config_dir")]
     pub git_config_dir: String,
     #[serde(default)]
     pub git_clone_url: String,
-    #[serde(default = "ConfigSettings::get_default_system_config")]
+    #[serde(default = "LocalConfig::get_default_system_config")]
     pub system_config: String,
 }
 
-impl Default for ConfigSettings {
+impl Default for LocalConfig {
     fn default() -> Self { 
-        ConfigSettings {
-            debug_level: ConfigSettings::get_default_debug_level(),
-            git_auto_sync: ConfigSettings::get_default_git_auto_sync(),
-            git_config_dir: ConfigSettings::get_default_git_config_dir(),
+        LocalConfig {
+            debug_level: LocalConfig::get_default_debug_level(),
+            git_auto_sync: LocalConfig::get_default_git_auto_sync(),
+            git_config_dir: LocalConfig::get_default_git_config_dir(),
             git_clone_url: "".to_string(),
             system_config: "".to_string()
         }
     }
 }
 
-impl BaseSettings for ConfigSettings {
-    fn get_settings_file_name() -> String {
+impl BaseConfig for LocalConfig {
+    fn get_config_file_name() -> String {
         return "config.json".to_string();
     }
 
-    fn get_default() -> ConfigSettings {
-        return ConfigSettings { ..Default::default()}
+    fn get_default() -> LocalConfig {
+        return LocalConfig { ..Default::default()}
     }
 }
 
-impl ConfigSettings {
+impl LocalConfig {
     pub fn get_default_debug_level() -> u8 {
         return 2;
     }
@@ -49,7 +49,7 @@ impl ConfigSettings {
     }
 
     pub fn get_default_git_config_dir() -> String {
-        let mut conf_dir = Self::get_settings_dir();
+        let mut conf_dir = Self::get_config_dir();
     
         conf_dir.push("git-config".to_string());
     

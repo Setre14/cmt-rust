@@ -1,15 +1,13 @@
 pub mod config;
-// pub mod env;
 pub mod util;
-pub mod settings;
 
 use clap::{Parser, Subcommand};
 
-use config::cli::config_cli::{ConfigCli};
-use config::cli::config_cli_command::{ConfigCliCommand};
-// use env::env_cli::{EnvCli, EnvCliCommand};
-use config::config_settings::ConfigSettings;
-use settings::base_settings::BaseSettings;
+use config::params::config_params_init::ConfigParamsInit;
+use config::params::config_params_update::ConfigParamsUpdate;
+use config::config::Config;
+use config::pojo::local_config::LocalConfig;
+use config::pojo::base_config::BaseConfig;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -28,9 +26,16 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    Config {
-        #[command(subcommand)]
-        command: ConfigCliCommand,
+    /// Init local config and clone git config
+    Init {
+        #[command(flatten)]
+        params: ConfigParamsInit,
+    },
+
+    /// Update local config
+    Update {
+        #[command(flatten)]
+        params: ConfigParamsUpdate,
     },
 
 //     Env {
@@ -41,8 +46,8 @@ enum Command {
 
 
 fn main() {
-    // let conf = app_config::get_settings();
-    let settings = ConfigSettings::get_settings();
+    // let conf = app_config::get_config();
+    let settings = LocalConfig::get_config();
 
     let cli = Cli::parse();
 
@@ -56,9 +61,12 @@ fn main() {
         .unwrap();
     
     match &cli.command {
-        Some(Command::Config { command }) => {
-            ConfigCli::handle_command(command)
-        }
+        Some(Command::Init { params }) => {
+            Config::init(params);
+        },
+        Some(Command::Update { params }) => {
+            Config::update(params);
+        },
         // Some(Command::Env { command }) => {
         //     EnvCli::handle_command(command)
         //     // git_config::init(url, dest, branch, track, *force);

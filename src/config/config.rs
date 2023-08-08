@@ -3,8 +3,8 @@ use std::fs;
 
 use crate::config::params::config_params_init::ConfigParamsInit;
 use crate::config::params::config_params_update::ConfigParamsUpdate;
-use crate::config::config_settings::ConfigSettings;
-use crate::settings::base_settings::BaseSettings;
+use crate::config::pojo::local_config::LocalConfig;
+use crate::config::pojo::base_config::BaseConfig;
 use crate::util::command_line::CommandLine;
 use crate::util::exec::Exec;
 
@@ -14,7 +14,7 @@ impl Config {
     pub fn init(params: &ConfigParamsInit) {
         log::info!("Init commnand");
 
-        let mut settings = ConfigSettings::get_settings();
+        let mut settings = LocalConfig::get_config();
 
         // let git_config_dir = settings.git_config_dir.clone();
         let git_config_dir = params.dest.clone().unwrap_or(settings.git_config_dir.clone());
@@ -34,7 +34,7 @@ impl Config {
         settings.git_clone_url = params.url.clone();
         settings.git_config_dir = git_config_dir.clone();
 
-        settings.save_settings();
+        settings.save_config();
 
         Self::update(&params.udpate_params);
     }
@@ -42,7 +42,7 @@ impl Config {
     pub fn update(params: &ConfigParamsUpdate) {
         log::info!("Update commnand");
 
-        let mut settings = ConfigSettings::get_settings();
+        let mut settings = LocalConfig::get_config();
 
         if params.debug_level.is_some() {
             settings.debug_level = params.debug_level.unwrap();
@@ -56,6 +56,6 @@ impl Config {
             settings.system_config = params.system_config.clone().unwrap();
         }
 
-        settings.save_settings();
+        settings.save_config();
     }
 }
