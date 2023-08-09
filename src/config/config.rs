@@ -30,7 +30,7 @@ impl Config {
         }
 
         let git_clone = CommandLine::create("git", ["clone", &params.url, &git_config_dir].to_vec());
-        Exec::status(&git_clone);
+        Exec::status(&git_clone, None);
 
         settings.git_clone_url = params.url.clone();
         settings.git_config_dir = git_config_dir.clone();

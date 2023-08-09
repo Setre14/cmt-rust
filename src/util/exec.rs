@@ -1,25 +1,19 @@
 use std::process::{Command, Stdio};
-use std::path::Path;
+use std::path::PathBuf;
 use std::env;
 
 use crate::util::command_line::CommandLine;
 
 pub struct Exec{}
 
-impl Exec {
-    pub fn status(command_line: &CommandLine) -> bool
+impl Exec {    
+    pub fn status(command_line: &CommandLine, opt_work_dir: Option<PathBuf>) -> bool
     {
-        return Self::status_in_dir(command_line, env::current_dir().unwrap())
-    }
-    
-    pub fn status_in_dir<P>(command_line: &CommandLine, current_dir: P) -> bool
-    where
-        P: AsRef<Path> + std::fmt::Debug,
-    {
-        log::debug!("Execute {:#?} in dir {:#?}", command_line, current_dir);
+        let work_dir = opt_work_dir.unwrap_or(env::current_dir().unwrap());
+        log::debug!("Execute {:?} in dir {:?}", command_line, work_dir);
         let status = Command::new(&command_line.command)
             .args(&command_line.args)
-            .current_dir(current_dir)
+            .current_dir(work_dir)
             // .stdout(Stdio::null())
             // .stderr(Stdio::null())
             .status()
@@ -47,34 +41,33 @@ pub mod tests {
     use crate::util::command_line::CommandLine;
     
     use std::env;
-    use std::path::Path;
     use pretty_assertions::assert_eq;
     
     #[test]
     fn test_status() {
         let command_line = CommandLine::create("ls", ["-la", ".gitignore"].to_vec());
 
-        assert_eq!(Exec::status(&command_line), true);
+        assert_eq!(Exec::status(&command_line, None), true);
     }    
     
     #[test]
     fn test_status_failed() {
         let command_line = CommandLine::create("ls", ["-la", ".gitignore232"].to_vec());
 
-        assert_eq!(Exec::status(&command_line), false);
+        assert_eq!(Exec::status(&command_line, None), false);
     }
     
     #[test]
     fn test_status_in_dir() {
         let command_line = CommandLine::create("ls", ["-la", ".gitignore"].to_vec());
 
-        assert_eq!(Exec::status_in_dir(&command_line, env::current_dir().unwrap()), true);
+        assert_eq!(Exec::status(&command_line, env::current_dir().ok()), true);
     }
 
     #[test]
     fn test_status_in_dir_failed() {
         let command_line = CommandLine::create("ls", ["-la", ".gitignore"].to_vec());
 
-        assert_eq!(Exec::status_in_dir(&command_line, &Path::new("/")), false);
+        assert_eq!(Exec::status(&command_line, Some(PathBuf::from("/"))), false);
     }
 }
