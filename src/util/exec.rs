@@ -25,7 +25,7 @@ impl Exec {
             .status()
             .unwrap();
     
-        log::debug!("Result: {:#?} {:#?}", status.success(), status);
+        log::debug!("Result: {:?} {:?}", status.success(), status);
     
         return status.success();
     }

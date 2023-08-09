@@ -1,9 +1,8 @@
 use serde::{de, Serialize};
 use dirs::config_dir;
 use std::fs;
-use std::fs::{File, OpenOptions};
 use std::path::PathBuf;
-use std::io::BufReader;
+use confy;
 
 pub trait BaseConfig<T=Self> 
 where T:  Serialize + de::DeserializeOwned+ Clone + std::fmt::Debug
@@ -27,39 +26,17 @@ where T:  Serialize + de::DeserializeOwned+ Clone + std::fmt::Debug
     }
 
     fn get_config() -> T
+    where T: Default
     {
-        let conf_buf = Self::get_config_file();
-        let config_file = conf_buf.as_path();
+        let app_name = env!("CARGO_PKG_NAME");
+        let cfg: T = confy::load(app_name, "local").unwrap();
 
-        let mut config = Self::get_default();
-
-        if config_file.exists() {
-            log::debug!("Load config_file: {:?}", config_file.clone());
-
-            let file = File::open(config_file).expect("Could not read app conf");
-            let reader = BufReader::new(file);
-            config = serde_json::from_reader(reader).expect("Could not descerialize app conf");
-        } else {
-            log::debug!("config_file {:?}, does not exits. Use default", config_file.clone());
-        }
-        
-        log::debug!("Config settings: {:#?}", config.clone());
-
-        return config;
+        return cfg;
     }
 
     fn save_config(&self) where Self: Serialize {
-        let config_file = Self::get_config_file();
-
-        let file = OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(true)
-            .open(config_file.clone()).expect("Could not open conf file");
-    
-        log::info!("Save config_file: {}", config_file.into_os_string().into_string().unwrap());
-    
-        serde_json::to_writer_pretty(&file, self).expect("Failed to write settings");
+        let app_name = env!("CARGO_PKG_NAME");
+        let _ = confy::store(app_name, "local", self).unwrap();
     }
 
 }
