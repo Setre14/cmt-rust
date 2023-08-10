@@ -31,32 +31,32 @@ impl Default for LocalConfig {
 
 impl BaseConfig for LocalConfig {
     fn get_config_file_name() -> String {
-        return "config.json".to_string();
+        "config.json".to_string()
     }
 
     fn get_default() -> LocalConfig {
-        return LocalConfig { ..Default::default()}
+        LocalConfig { ..Default::default()}
     }
 }
 
 impl LocalConfig {
     pub fn get_default_debug_level() -> u8 {
-        return 2;
+        2
     }
 
     pub fn get_default_git_auto_sync() -> bool {
-        return true;
+        true
     }
 
     pub fn get_default_git_config_dir() -> String {
         let mut conf_dir = Self::get_config_dir();
     
-        conf_dir.push("git-config".to_string());
+        conf_dir.push("git-config");
     
-        return conf_dir.into_os_string().into_string().unwrap();
+        conf_dir.into_os_string().into_string().unwrap()
     }
 
     pub fn get_default_system_config() -> String {
-        return Exec::get_hostname();
+        Exec::get_hostname()
     }
 }

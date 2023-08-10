@@ -15,14 +15,14 @@ where T:  Serialize + de::DeserializeOwned+ Clone + std::fmt::Debug
         settings_dir.push("cmt-rust");
         let _ = fs::create_dir_all(settings_dir.clone());
 
-        return settings_dir;
+        settings_dir
     }
 
     fn get_config_file() -> PathBuf {
         let mut settings_dir = Self::get_config_dir();
         settings_dir.push(Self::get_config_file_name());
     
-        return settings_dir;
+        settings_dir
     }
 
     fn get_config() -> T
@@ -31,12 +31,12 @@ where T:  Serialize + de::DeserializeOwned+ Clone + std::fmt::Debug
         let app_name = env!("CARGO_PKG_NAME");
         let cfg: T = confy::load(app_name, "local").unwrap();
 
-        return cfg;
+        cfg
     }
 
     fn save_config(&self) where Self: Serialize {
         let app_name = env!("CARGO_PKG_NAME");
-        let _ = confy::store(app_name, "local", self).unwrap();
+        confy::store(app_name, "local", self).unwrap();
     }
 
 }

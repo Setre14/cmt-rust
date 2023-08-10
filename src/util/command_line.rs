@@ -8,7 +8,7 @@ pub struct CommandLine {
 
 impl CommandLine {
     pub fn create(command: &str, args: Vec<&str>) -> CommandLine {
-        return CommandLine {
+        CommandLine {
             command: String::from(command), 
             args: VecUtil::to_vec_string(&args)
         }

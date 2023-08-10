@@ -21,7 +21,7 @@ impl Exec {
     
         log::debug!("Result: {:?} {:?}", status.success(), status);
     
-        return status.success();
+        status.success()
     }
 
     pub fn get_hostname() -> String {
@@ -29,9 +29,9 @@ impl Exec {
             .stdout(Stdio::piped())
             .output()
             .unwrap();
-        let stdout = String::from_utf8(output.stdout).unwrap().replace("\n", "");
+        
     
-        return stdout;
+        String::from_utf8(output.stdout).unwrap().replace('\n', "")
     }
 }
 
