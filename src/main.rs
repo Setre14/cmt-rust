@@ -11,6 +11,10 @@ use env::cli::env_cli::EnvCli;
 use env::cli::env_cli_command::EnvCliCommand;
 use config::pojo::local_config::LocalConfig;
 use config::pojo::base_config::BaseConfig;
+use util::command_line::CommandLine;
+use util::confy_util::ConfyUtil;
+use util::exec::Exec;
+use util::path_util::PathUtil;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -41,6 +45,9 @@ enum Command {
         params: ConfigParamsUpdate,
     },
 
+    Code {},
+    Nvim {},
+
     Env {
         #[command(subcommand)]
         command: EnvCliCommand,
@@ -69,6 +76,16 @@ fn main() {
         },
         Some(Command::Update { params }) => {
             Config::update(params);
+        },
+        Some(Command::Code {}) => {
+            let path = ConfyUtil::get_configuration_dir("config");
+            let path_string = PathUtil::to_string(&path);
+            Exec::status(&CommandLine{command: "code".to_string(), args: [path_string].to_vec()}, None);
+        },
+        Some(Command::Nvim {}) => {
+            let path = ConfyUtil::get_configuration_dir("config");
+            let path_string = PathUtil::to_string(&path);
+            Exec::status(&CommandLine{command: "nvim".to_string(), args: [path_string].to_vec()}, None);
         },
         Some(Command::Env { command }) => {
             EnvCli::handle_command(command)

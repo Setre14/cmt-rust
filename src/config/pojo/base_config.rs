@@ -4,6 +4,8 @@ use std::fs;
 use std::path::PathBuf;
 use confy;
 
+use crate::util::confy_util::ConfyUtil;
+
 pub trait BaseConfig<T=Self> 
 where T:  Serialize + de::DeserializeOwned+ Clone + std::fmt::Debug
 {
@@ -11,8 +13,7 @@ where T:  Serialize + de::DeserializeOwned+ Clone + std::fmt::Debug
     fn get_default() -> T;
 
     fn get_config_dir() -> PathBuf {
-        let mut settings_dir = config_dir().expect("Could not get config dir");
-        settings_dir.push("cmt-rust");
+        let settings_dir = ConfyUtil::get_configuration_dir("config");
         let _ = fs::create_dir_all(settings_dir.clone());
 
         settings_dir

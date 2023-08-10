@@ -24,7 +24,7 @@ impl Default for LocalConfig {
             git_auto_sync: LocalConfig::get_default_git_auto_sync(),
             git_config_dir: LocalConfig::get_default_git_config_dir(),
             git_clone_url: "".to_string(),
-            system_config: "".to_string()
+            system_config: "system".to_string()
         }
     }
 }
