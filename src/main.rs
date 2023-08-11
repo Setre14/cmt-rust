@@ -56,8 +56,7 @@ enum Command {
 
 
 fn main() {
-    // let conf = app_config::get_config();
-    let settings = LocalConfig::get_config();
+    let settings = LocalConfig::get_config(None);
 
     let cli = Cli::parse();
 
@@ -89,7 +88,6 @@ fn main() {
         },
         Some(Command::Env { command }) => {
             EnvCli::handle_command(command)
-            // git_config::init(url, dest, branch, track, *force);
         }
         None => {} 
     }

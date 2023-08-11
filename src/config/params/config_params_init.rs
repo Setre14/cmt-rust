@@ -7,9 +7,9 @@ pub struct ConfigParamsInit {
     /// Git clone url
     pub url: String,
 
-    /// Destination for git clone, default: ~/.config/cmt-rust
-    #[arg(short, long)]
-    pub dest: Option<String>,
+    // /// Destination for git clone, default: ~/.config/cmt-rust
+    // #[arg(short, long)]
+    // pub dest: Option<String>,
 
     // /// Branch to checkout otherwise default branch is used
     // #[arg(short, long)]

@@ -1,43 +1,45 @@
-use serde::{de, Serialize};
-use dirs::config_dir;
-use std::fs;
 use std::path::PathBuf;
+
+use serde::{de, Serialize};
 use confy;
 
-use crate::util::confy_util::ConfyUtil;
+use crate::{util::{confy_util::ConfyUtil, path_util::PathUtil}, config::pojo::local_config::LocalConfig};
 
 pub trait BaseConfig<T=Self> 
-where T:  Serialize + de::DeserializeOwned+ Clone + std::fmt::Debug
+where T:  Serialize + de::DeserializeOwned + Clone + std::fmt::Debug
 {
-    fn get_config_file_name() -> String;
-    fn get_default() -> T;
+    fn get_default_config_file_name() -> String;
+    fn get_config_file_name(&self) -> String;
+    fn set_config_file_name(&mut self, file_name: &str);
 
-    fn get_config_dir() -> PathBuf {
-        let settings_dir = ConfyUtil::get_configuration_dir("config");
-        let _ = fs::create_dir_all(settings_dir.clone());
-
-        settings_dir
-    }
-
-    fn get_config_file() -> PathBuf {
-        let mut settings_dir = Self::get_config_dir();
-        settings_dir.push(Self::get_config_file_name());
-    
-        settings_dir
-    }
-
-    fn get_config() -> T
-    where T: Default
+    fn get_config(file_name: Option<String>) -> T
+    where T: Default + std::fmt::Debug + BaseConfig
     {
-        let app_name = env!("CARGO_PKG_NAME");
-        let cfg: T = confy::load(app_name, "local").unwrap();
+        let app_name = ConfyUtil::get_app_name();
+        let default_file_name = Self::get_default_config_file_name();
+        let mut config_name = file_name.unwrap_or(default_file_name);
+
+        if config_name != LocalConfig::get_default_config_file_name() {
+            log::error!("Not local config");
+            let mut path = PathBuf::from(ConfyUtil::get_git_config_dir());
+            path.push(config_name);
+
+            config_name = PathUtil::to_string(&path);
+        }
+
+        let mut cfg: T = confy::load(&app_name, config_name.as_str()).unwrap();
+        cfg.set_config_file_name(config_name.as_str());
+        log::debug!("Load config: {:?}, {:?}", config_name.clone(), cfg.clone());
+
 
         cfg
     }
+}
 
-    fn save_config(&self) where Self: Serialize {
-        let app_name = env!("CARGO_PKG_NAME");
-        confy::store(app_name, "local", self).unwrap();
-    }
-
+pub fn save_config<T>(cfg: &T) where T: BaseConfig + Serialize + de::DeserializeOwned + Clone + std::fmt::Debug {
+    let app_name = ConfyUtil::get_app_name();
+    let config_name = cfg.get_config_file_name();
+    log::debug!("Save config: {:?}, {:?}", config_name.clone(), cfg.clone());
+    
+    confy::store(&app_name, config_name.as_str(), cfg).unwrap();
 }
