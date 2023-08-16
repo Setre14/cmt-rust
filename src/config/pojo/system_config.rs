@@ -4,16 +4,14 @@ use serde::{Serialize, Deserialize};
 
 use crate::{config::pojo::base_config::BaseConfig, util::{path_util::PathUtil, confy_util::ConfyUtil}};
 
-use super::{local_config::LocalConfig, system_env_config::SystemEnvConfig};
-
-
+use super::{local_config::LocalConfig, system_env_config::SystemEnvConfig, system_package_config::SystemPackageConfig};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct SystemConfig {
     #[serde(skip_serializing, default)]
     pub file_name: String,
     #[serde(default)]
-    pub package_config: BTreeSet<String>,
+    pub package_config: SystemPackageConfig,
     #[serde(default)]
     pub env_config: SystemEnvConfig,
 }
