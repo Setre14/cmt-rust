@@ -45,8 +45,11 @@ enum Command {
         params: ConfigParamsUpdate,
     },
 
-    Code {},
-    Nvim {},
+    Open {
+        /// Open git config
+        #[arg(short = 'g', long)]
+        open_git_config: bool,
+    },
 
     Env {
         #[command(subcommand)]
@@ -76,15 +79,8 @@ fn main() {
         Some(Command::Update { params }) => {
             Config::update(params);
         },
-        Some(Command::Code {}) => {
-            let path = ConfyUtil::get_configuration_dir("config");
-            let path_string = PathUtil::to_string(&path);
-            Exec::status(&CommandLine{command: "code".to_string(), args: [path_string].to_vec()}, None);
-        },
-        Some(Command::Nvim {}) => {
-            let path = ConfyUtil::get_configuration_dir("config");
-            let path_string = PathUtil::to_string(&path);
-            Exec::status(&CommandLine{command: "nvim".to_string(), args: [path_string].to_vec()}, None);
+        Some(Command::Open { open_git_config }) => {
+            Config::open_in_editor(&settings.editor, open_git_config)
         },
         Some(Command::Env { command }) => {
             EnvCli::handle_command(command)

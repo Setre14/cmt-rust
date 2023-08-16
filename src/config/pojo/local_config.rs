@@ -15,6 +15,8 @@ pub struct LocalConfig {
     pub git_clone_url: String,
     #[serde(default = "LocalConfig::get_default_system_config")]
     pub system_config: String,
+    #[serde(default = "LocalConfig::get_default_editor")]
+    pub editor: String,
 }
 
 impl Default for LocalConfig {
@@ -24,7 +26,8 @@ impl Default for LocalConfig {
             debug_level: LocalConfig::get_default_debug_level(),
             git_auto_sync: LocalConfig::get_default_git_auto_sync(),
             git_clone_url: "".to_string(),
-            system_config: "system".to_string()
+            system_config: "system".to_string(),
+            editor: "code".to_string()
         }
     }
 }
@@ -54,5 +57,9 @@ impl LocalConfig {
 
     pub fn get_default_system_config() -> String {
         Exec::get_hostname()
+    }
+
+    pub fn get_default_editor() -> String {
+        "code".to_string()
     }
 }

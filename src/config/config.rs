@@ -56,8 +56,21 @@ impl Config {
 
         if params.system_config.is_some() {
             settings.system_config = params.system_config.clone().unwrap();
+        }        
+        
+        if params.editor.is_some() {
+            settings.editor = params.editor.clone().unwrap();
         }
 
         base_config::save_config(&settings);
+    }
+
+    pub fn open_in_editor(editor: &str, open_git_config: &bool) {
+            let path = match (open_git_config) {
+                true => ConfyUtil::get_git_configuration_dir(),
+                false => ConfyUtil::get_configuration_dir("config"),
+            };
+            let path_string = PathUtil::to_string(&path);
+            Exec::status(&CommandLine{command: editor.to_string(), args: [path_string].to_vec()}, None);
     }
 }

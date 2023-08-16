@@ -13,4 +13,8 @@ pub struct ConfigParamsUpdate {
     /// System config to use
     #[arg(short = 'c', long)]
     pub system_config: Option<String>,
+
+    /// Editor to use
+    #[arg(short, long)]
+    pub editor: Option<String>
 } 
