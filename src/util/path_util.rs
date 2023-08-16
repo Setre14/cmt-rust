@@ -1,9 +1,9 @@
-use std::path::PathBuf;
+use std::path::Path;
 
 pub struct PathUtil {}
 
 impl PathUtil {
-    pub fn to_string(path: &PathBuf) -> String {
-        return path.clone().into_os_string().into_string().unwrap();
+    pub fn to_string(path: &Path) -> String {
+        path.to_str().unwrap().to_string()
     }
 }

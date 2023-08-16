@@ -27,7 +27,7 @@ pub mod tests {
     fn test_create() {
         let expected = CommandLine {
             command: String::from("ls"),
-            args: VecUtil::to_vec_string(&["-l", "-a"].to_vec())
+            args: VecUtil::to_vec_string(["-l", "-a"].as_ref())
         };
 
         let actual = CommandLine::create("ls", ["-l", "-a"].to_vec());

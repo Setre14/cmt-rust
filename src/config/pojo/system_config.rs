@@ -1,21 +1,32 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, collections::BTreeSet};
 
 use serde::{Serialize, Deserialize};
 
-use crate::{config::pojo::base_config::BaseConfig, util::{path_util::PathUtil, confy_util::ConfyUtil}};
+use crate::{config::pojo::base_config::BaseConfig, util::{path_util::PathUtil, confy_util::ConfyUtil, exec::Exec}};
 
 use super::local_config::LocalConfig;
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SystemConfig {
     #[serde(skip_serializing, default)]
     pub file_name: String,
     #[serde(default)]
     pub template_values: String,
+    #[serde(default = "SystemConfig::get_default_env_config")]
+    pub env_config: BTreeSet<String>,
     #[serde(default)]
-    pub env_config: Vec<String>,
-    #[serde(default)]
-    pub package_config: Vec<String>,
+    pub package_config: BTreeSet<String>,
+}
+
+impl Default for SystemConfig {
+    fn default() -> Self { 
+        SystemConfig {
+            file_name: "system".to_string(),
+            template_values: "".to_string(),
+            env_config: SystemConfig::get_default_env_config(),
+            package_config: BTreeSet::new(),
+        }
+    }
 }
 
 impl BaseConfig for SystemConfig {
@@ -41,5 +52,11 @@ impl SystemConfig {
     pub fn get_system_config() -> SystemConfig {
         let settings = LocalConfig::get_config(None);
         SystemConfig::get_config(Some(settings.system_config))
+    }
+
+    pub fn get_default_env_config() -> BTreeSet<String> {
+        let mut env_configs: BTreeSet<String> = BTreeSet::new();
+        env_configs.insert(Exec::get_hostname());
+        env_configs
     }
 }

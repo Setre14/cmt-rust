@@ -12,7 +12,7 @@ impl ConfyUtil {
     }
 
     pub fn get_git_config_dir() -> String {
-        return "git-config".to_string();
+        "git-config".to_string()
     }
 
     pub fn get_git_configuration_dir() -> PathBuf {
@@ -34,5 +34,9 @@ impl ConfyUtil {
         path.pop();
 
         path
+    }
+
+    pub fn get_config_file_ending() -> String {
+        ".toml".to_string()
     }
 }

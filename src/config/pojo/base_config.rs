@@ -20,7 +20,6 @@ where T:  Serialize + de::DeserializeOwned + Clone + std::fmt::Debug
         let mut config_name = file_name.unwrap_or(default_file_name);
 
         if config_name != LocalConfig::get_default_config_file_name() {
-            log::error!("Not local config");
             let mut path = PathBuf::from(ConfyUtil::get_git_config_dir());
             path.push(config_name);
 
