@@ -1,10 +1,12 @@
-use std::path::PathBuf;
+use std::io::BufReader;
+use std::{path::PathBuf, fs::File};
 use std::fs;
 
 use fs_extra::{dir, copy_items};
+use handlebars::Handlebars;
 use serde::{Serialize, Deserialize};
 
-
+use crate::config::pojo::system_config::SystemConfig;
 
 use super::env_dir::EnvDir;
 
@@ -43,21 +45,60 @@ impl EnvPath {
     }
 
     pub fn copy_to_remote(&self) {
-        let remote_path = self.get_remote_path();
-        log::info!("remote_path: {:#?}", remote_path.clone());
-        let local_path = self.get_local_path();
-        log::info!("local_path: {:#?}", local_path.clone());
-
-        Self::copy(&local_path, &remote_path);
+        let destination = self.get_remote_path();
+        log::info!("remote_path: {:#?}", destination.clone());
+        let source = self.get_local_path();
+        log::info!("local_path: {:#?}", source.clone());
+   
+        Self::copy(&source, &destination);
     }
 
     pub fn copy_to_local(&self) {
-        let remote_path = self.get_remote_path();
-        log::info!("remote_path: {:#?}", remote_path.clone());
-        let local_path = self.get_local_path();
-        log::info!("local_path: {:#?}", local_path.clone());
+        let source = self.get_remote_path();
+        log::info!("remote_path: {:#?}", source.clone());
+        let destination = self.get_local_path();
+        log::info!("local_path: {:#?}", destination.clone());
 
-        Self::copy(&remote_path, &local_path);
+        let system_config = SystemConfig::get_system_config();
+        let mut values_file = EnvDir::get_env_dir();
+        values_file.push(&system_config.template_values);
+        let file = File::open(values_file).unwrap();
+        let reader = BufReader::new(file);
+    
+        let data: serde_json::Value = serde_json::from_reader(reader).unwrap();
+        log::debug!("data: {:?}", data);
+
+
+        let mut dest_dir = destination.clone();
+        dest_dir.pop();
+        let _ = fs::create_dir_all(dest_dir.clone());
+
+        if source.is_dir() {
+            let mut options = dir::CopyOptions::new();
+            options.overwrite = true;
+
+            let from_paths = vec![&source];
+
+            log::info!("Copy directoy from '{:#?}' to '{:#?}'", &source, destination);
+
+            let result = copy_items(&from_paths, &dest_dir, &options);
+            log::debug!("Result: {:#?}", result);
+        } else {
+            log::info!("Copy file from '{:#?}' to '{:#?}'", source, destination);
+
+
+
+            let handlebars = Handlebars::new();
+
+            let template_contents = fs::read_to_string(source)
+            .expect("Should have been able to read the file");
+
+            let writer = File::create(&destination).unwrap();
+            let _ = handlebars.render_template_to_write(&template_contents, &data, writer);
+
+        }
+
+        // Self::copy(&local_path, &remote_path);
     }
 
     pub fn delte_from_remote(&self) {
@@ -89,11 +130,11 @@ impl EnvPath {
             log::info!("Copy directoy from '{:#?}' to '{:#?}'", source, destination);
 
             let result = copy_items(&from_paths, &dest_dir, &options);
-            log::debug!("Result: {:#?}", result);
+            log::debug!("Copy Result: {:#?}", result);
         } else {
             log::info!("Copy file from '{:#?}' to '{:#?}'", source, destination);
             let result = fs::copy(source, destination);
-            log::debug!("Result: {:#?}", result);
+            log::debug!("Copy Result: {:#?}", result);
         }
     }
 }

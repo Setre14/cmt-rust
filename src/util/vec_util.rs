@@ -14,7 +14,7 @@ pub mod tests {
     
     #[test]
     fn test_to_vec_string() {
-        let mut expected = vec!["ls".to_string(), "-l".to_string(), "-a".to_string()];
+        let expected = vec!["ls".to_string(), "-l".to_string(), "-a".to_string()];
 
         assert_eq!(VecUtil::to_vec_string(["ls", "-l", "-a"].as_ref()), expected);
     }
