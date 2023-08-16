@@ -2,7 +2,7 @@ use std::{path::PathBuf, collections::BTreeSet};
 
 use serde::{Serialize, Deserialize};
 
-use crate::{config::pojo::base_config::BaseConfig, util::{path_util::PathUtil, confy_util::ConfyUtil, exec::Exec}};
+use crate::{config::pojo::base_config::BaseConfig, util::{path_util::PathUtil, confy_util::ConfyUtil}};
 
 use super::local_config::LocalConfig;
 
@@ -56,7 +56,7 @@ impl SystemConfig {
 
     pub fn get_default_env_config() -> BTreeSet<String> {
         let mut env_configs: BTreeSet<String> = BTreeSet::new();
-        env_configs.insert(Exec::get_hostname());
+        env_configs.insert("env".to_string());
         env_configs
     }
 }
