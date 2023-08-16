@@ -1,6 +1,9 @@
+use std::path::PathBuf;
+
 use serde::{Serialize, Deserialize};
 
 use crate::config::pojo::base_config::BaseConfig;
+use crate::util::confy_util::ConfyUtil;
 use crate::util::exec::Exec;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -43,6 +46,10 @@ impl BaseConfig for LocalConfig {
 
     fn set_config_file_name(&mut self, file_name: &str) {
         self.file_name = file_name.to_string();
+    }
+
+    fn get_dir() -> PathBuf {
+        ConfyUtil::get_root_configuration_dir()
     }
 }
 

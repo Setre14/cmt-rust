@@ -46,6 +46,10 @@ impl BaseConfig for SystemConfig {
     fn set_config_file_name(&mut self, file_name: &str) {
         self.file_name = file_name.to_string();
     }
+
+    fn get_dir() -> PathBuf {
+        ConfyUtil::get_git_configuration_dir()
+    }
 }
 
 impl SystemConfig {

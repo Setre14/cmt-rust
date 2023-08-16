@@ -12,6 +12,8 @@ where T:  Serialize + de::DeserializeOwned + Clone + std::fmt::Debug
     fn get_config_file_name(&self) -> String;
     fn set_config_file_name(&mut self, file_name: &str);
 
+    fn get_dir() -> PathBuf;
+
     fn get_config(file_name: Option<String>) -> T
     where T: Default + std::fmt::Debug + BaseConfig
     {

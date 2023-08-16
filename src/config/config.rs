@@ -68,7 +68,7 @@ impl Config {
     pub fn open_in_editor(editor: &str, open_git_config: &bool) {
             let path = match open_git_config {
                 true => ConfyUtil::get_git_configuration_dir(),
-                false => ConfyUtil::get_configuration_dir("config"),
+                false => ConfyUtil::get_root_configuration_dir(),
             };
             let path_string = PathUtil::to_string(&path);
             Exec::status(&CommandLine{command: editor.to_string(), args: [path_string].to_vec()}, None);

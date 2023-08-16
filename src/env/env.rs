@@ -4,7 +4,6 @@ use crate::config::pojo::base_config;
 use crate::config::pojo::env_config::EnvConfig;
 use crate::config::pojo::system_config::SystemConfig;
 use crate::env::env_path::EnvPath;
-use crate::env::env_dir::EnvDir;
 use crate::env::params::env_params_add_remove::EnvParamsAddRemove;
 
 use super::params::env_params_config_add_remove::EnvParamsConfigAddRemove;
@@ -32,7 +31,7 @@ impl Env {
         env_config.paths.remove(&env_path);
         base_config::save_config(&env_config);
 
-        let env_configs = EnvDir::get_configs();
+        let env_configs = EnvConfig::get_configs();
 
         let mut remove = true;
         for env_conf in env_configs {
@@ -100,7 +99,7 @@ impl Env {
         let system_config = SystemConfig::get_system_config();
 
         let configs = match params.all {
-            true => EnvDir::get_configs(),
+            true => EnvConfig::get_configs(),
             false => system_config.env_config
             
         };
@@ -111,7 +110,7 @@ impl Env {
     }
 
     pub fn config_add(params: &EnvParamsConfigAddRemove) {
-        if !EnvDir::config_exists(&params.config) {
+        if !EnvConfig::config_exists(&params.config) {
             println!("Config {} not found", &params.config);
 
             println!("List of available configs:");

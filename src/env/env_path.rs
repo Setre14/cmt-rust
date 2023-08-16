@@ -6,9 +6,9 @@ use fs_extra::{dir, copy_items};
 use handlebars::Handlebars;
 use serde::{Serialize, Deserialize};
 
+use crate::config::pojo::env_config::EnvConfig;
+use crate::config::pojo::base_config::BaseConfig;
 use crate::config::pojo::system_config::SystemConfig;
-
-use super::env_dir::EnvDir;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone, PartialOrd, Eq, Ord)]
 pub struct EnvPath {
@@ -33,7 +33,7 @@ impl EnvPath {
     }
 
     pub fn get_remote_path(&self) -> PathBuf {
-        let mut confg_dir = EnvDir::get_env_dir();
+        let mut confg_dir = EnvConfig::get_dir();
         confg_dir.push(&self.path);
         confg_dir
     }    
@@ -60,7 +60,7 @@ impl EnvPath {
         log::info!("local_path: {:#?}", destination.clone());
 
         let system_config = SystemConfig::get_system_config();
-        let mut values_file = EnvDir::get_env_dir();
+        let mut values_file = EnvConfig::get_dir();
         values_file.push(&system_config.template_values);
         let file = File::open(values_file).unwrap();
         let reader = BufReader::new(file);
