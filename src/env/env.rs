@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use crate::config::pojo::base_config;
 use crate::config::pojo::env_config::EnvConfig;
 use crate::config::pojo::system_config::SystemConfig;
@@ -67,15 +69,31 @@ impl Env {
     }
 
     pub fn apply() {
-        log::info!("apply commnand");
-        log::error!("Not implemented yet");
-        std::process::exit(1);
+        let system_config = SystemConfig::get_system_config();
+
+        let mut env_paths = BTreeSet::new();
+        for env_config in system_config.env_config {
+            let config = EnvConfig::get_env_config(&env_config);
+            env_paths.extend(config.paths);
+        }
+
+        for env_path in env_paths {
+            env_path.copy_to_local();
+        }
     }
 
     pub fn sync() {
-        log::info!("sync commnand");
-        log::error!("Not implemented yet");
-        std::process::exit(1);
+        let system_config = SystemConfig::get_system_config();
+
+        let mut env_paths = BTreeSet::new();
+        for env_config in system_config.env_config {
+            let config = EnvConfig::get_env_config(&env_config);
+            env_paths.extend(config.paths);
+        }
+
+        for env_path in env_paths {
+            env_path.copy_to_remote();
+        }
     }
 
     pub fn config_list(params: &EnvParamsConfigList) {

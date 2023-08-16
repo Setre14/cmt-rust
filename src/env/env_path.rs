@@ -43,15 +43,21 @@ impl EnvPath {
     }
 
     pub fn copy_to_remote(&self) {
-        // todo!()
         let remote_path = self.get_remote_path();
         log::info!("remote_path: {:#?}", remote_path.clone());
         let local_path = self.get_local_path();
         log::info!("local_path: {:#?}", local_path.clone());
-        // let abs_env_path = Self::get_abs_env_path(&env_path);
-        // log::info!("Abs env path: {:#?}", abs_env_path.clone());
 
         Self::copy(&local_path, &remote_path);
+    }
+
+    pub fn copy_to_local(&self) {
+        let remote_path = self.get_remote_path();
+        log::info!("remote_path: {:#?}", remote_path.clone());
+        let local_path = self.get_local_path();
+        log::info!("local_path: {:#?}", local_path.clone());
+
+        Self::copy(&remote_path, &local_path);
     }
 
     pub fn delte_from_remote(&self) {
