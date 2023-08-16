@@ -55,12 +55,12 @@ impl Env {
             None => {
                 let system_config = SystemConfig::get_system_config();
 
-                if system_config.env_config.len() > 1 {
+                if system_config.env_config.configs.len() > 1 {
                     log::error!("More then one env config is set, specify where it should be added with --env-config");
                     std::process::exit(1);
                 }
 
-                system_config.env_config.first().unwrap().clone()
+                system_config.env_config.configs.first().unwrap().clone()
             },
         };
 
@@ -70,8 +70,12 @@ impl Env {
     pub fn apply() {
         let system_config = SystemConfig::get_system_config();
 
+
+        println!("{:?}", &system_config);
+        base_config::save_config(&system_config);
+
         let mut env_paths = BTreeSet::new();
-        for env_config in system_config.env_config {
+        for env_config in system_config.env_config.configs {
             let config = EnvConfig::get_env_config(&env_config);
             env_paths.extend(config.paths);
         }
@@ -85,7 +89,7 @@ impl Env {
         let system_config = SystemConfig::get_system_config();
 
         let mut env_paths = BTreeSet::new();
-        for env_config in system_config.env_config {
+        for env_config in system_config.env_config.configs {
             let config = EnvConfig::get_env_config(&env_config);
             env_paths.extend(config.paths);
         }
@@ -100,7 +104,7 @@ impl Env {
 
         let configs = match params.all {
             true => EnvConfig::get_configs(),
-            false => system_config.env_config
+            false => system_config.env_config.configs
             
         };
 
@@ -119,13 +123,13 @@ impl Env {
         }
 
         let mut system_config = SystemConfig::get_system_config();
-        system_config.env_config.insert(params.config.clone());
+        system_config.env_config.configs.insert(params.config.clone());
         base_config::save_config(&system_config);
     }
 
     pub fn config_remove(params: &EnvParamsConfigAddRemove) {
         let mut system_config = SystemConfig::get_system_config();
-        system_config.env_config.remove(&params.config);
+        system_config.env_config.configs.remove(&params.config);
         base_config::save_config(&system_config);
     }
 }

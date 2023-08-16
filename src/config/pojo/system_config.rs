@@ -4,29 +4,18 @@ use serde::{Serialize, Deserialize};
 
 use crate::{config::pojo::base_config::BaseConfig, util::{path_util::PathUtil, confy_util::ConfyUtil}};
 
-use super::local_config::LocalConfig;
+use super::{local_config::LocalConfig, system_env_config::SystemEnvConfig};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct SystemConfig {
     #[serde(skip_serializing, default)]
     pub file_name: String,
     #[serde(default)]
-    pub template_values: String,
-    #[serde(default = "SystemConfig::get_default_env_config")]
-    pub env_config: BTreeSet<String>,
-    #[serde(default)]
     pub package_config: BTreeSet<String>,
-}
-
-impl Default for SystemConfig {
-    fn default() -> Self { 
-        SystemConfig {
-            file_name: "system".to_string(),
-            template_values: "".to_string(),
-            env_config: SystemConfig::get_default_env_config(),
-            package_config: BTreeSet::new(),
-        }
-    }
+    #[serde(default)]
+    pub env_config: SystemEnvConfig,
 }
 
 impl BaseConfig for SystemConfig {

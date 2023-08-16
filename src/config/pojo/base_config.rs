@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use serde::{de, Serialize};
 use confy;
 
-use crate::{util::{confy_util::ConfyUtil, path_util::PathUtil}, config::pojo::local_config::LocalConfig};
+use crate::{util::{confy_util::ConfyUtil, path_util::PathUtil}, config::pojo::{local_config::LocalConfig, system_config::{self, SystemConfig}}};
 
 pub trait BaseConfig<T=Self> 
 where T:  Serialize + de::DeserializeOwned + Clone + std::fmt::Debug
@@ -28,9 +28,10 @@ where T:  Serialize + de::DeserializeOwned + Clone + std::fmt::Debug
             config_name = PathUtil::to_string(&path);
         }
 
+        log::debug!("Load config: {:?}", &config_name);
         let mut cfg: T = confy::load(&app_name, config_name.as_str()).unwrap();
         cfg.set_config_file_name(config_name.as_str());
-        log::debug!("Load config: {:?}, {:?}", config_name.clone(), cfg.clone());
+        log::debug!("Loaded config: {:?}", &cfg);
 
 
         cfg

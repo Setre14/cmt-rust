@@ -61,7 +61,7 @@ impl EnvPath {
 
         let system_config = SystemConfig::get_system_config();
         let mut values_file = EnvConfig::get_dir();
-        values_file.push(&system_config.template_values);
+        values_file.push(&system_config.env_config.template_values);
         let file = File::open(values_file).unwrap();
         let reader = BufReader::new(file);
     
