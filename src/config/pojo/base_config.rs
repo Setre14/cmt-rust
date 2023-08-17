@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, collections::BTreeSet, fs};
 
 use serde::{de, Serialize};
 use confy;
@@ -35,6 +35,31 @@ where T:  Serialize + de::DeserializeOwned + Clone + std::fmt::Debug
 
 
         cfg
+    }
+
+    fn get_configs() -> BTreeSet<String> {
+        let mut configs: BTreeSet<String> = BTreeSet::new();
+
+        let paths = fs::read_dir(Self::get_dir()).unwrap();
+
+        for p in paths {
+            let  path = p.unwrap().path();
+            if !path.is_file() {
+                continue;
+            }
+
+            let file = path.file_name().unwrap().to_str().unwrap();
+
+            if !file.ends_with(&ConfyUtil::get_config_file_ending()) {
+                continue;
+            }
+
+            let file_name = file.replace(&ConfyUtil::get_config_file_ending(), "");
+
+            configs.insert(file_name);
+        }
+
+        configs
     }
 }
 

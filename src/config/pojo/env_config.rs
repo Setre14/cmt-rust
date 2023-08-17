@@ -1,4 +1,4 @@
-use std::{path::PathBuf, collections::BTreeSet, fs};
+use std::{path::PathBuf, collections::BTreeSet};
 
 use serde::{Serialize, Deserialize};
 
@@ -39,31 +39,6 @@ impl BaseConfig for EnvConfig {
 impl EnvConfig {
     pub fn get_env_config(config: &str) -> EnvConfig {
         EnvConfig::get_config(Some(format!("env/{}", config)))
-    }
-
-    pub fn get_configs() -> BTreeSet<String> {
-        let mut configs: BTreeSet<String> = BTreeSet::new();
-
-        let paths = fs::read_dir(Self::get_dir()).unwrap();
-
-        for p in paths {
-            let  path = p.unwrap().path();
-            if !path.is_file() {
-                continue;
-            }
-
-            let file = path.file_name().unwrap().to_str().unwrap();
-
-            if !file.ends_with(&ConfyUtil::get_config_file_ending()) {
-                continue;
-            }
-
-            let file_name = file.replace(&ConfyUtil::get_config_file_ending(), "");
-
-            configs.insert(file_name);
-        }
-
-        configs
     }
 
     pub fn config_exists(config: &str) -> bool {

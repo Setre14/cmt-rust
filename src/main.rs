@@ -1,6 +1,7 @@
 pub mod config;
 pub mod util;
 pub mod env;
+pub mod pkg;
 
 use clap::{Parser, Subcommand};
 
@@ -11,6 +12,8 @@ use env::cli::env_cli::EnvCli;
 use env::cli::env_cli_command::EnvCliCommand;
 use config::pojo::local_config::LocalConfig;
 use config::pojo::base_config::BaseConfig;
+use pkg::dnf::cli::dnf_cli::DnfCli;
+use pkg::dnf::cli::dnf_cli_command::DnfCliCommand;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -41,15 +44,23 @@ enum Command {
         params: ConfigParamsUpdate,
     },
 
+    /// Open config in editor
     Open {
         /// Open git config
         #[arg(short = 'g', long)]
         open_git_config: bool,
     },
 
+    /// Manipulate env files
     Env {
         #[command(subcommand)]
         command: EnvCliCommand,
+    },
+
+    /// Interact with dnf package manager
+    Dnf {
+        #[command(subcommand)]
+        command: DnfCliCommand,
     }
 }
 
@@ -80,7 +91,10 @@ fn main() {
         },
         Some(Command::Env { command }) => {
             EnvCli::handle_command(command)
-        }
+        },
+        Some(Command::Dnf { command }) => {
+            DnfCli::handle_command(command)
+        },
         None => {} 
     }
 }

@@ -88,6 +88,23 @@ impl Config {
         }
     }
     
+    pub fn pull() {
+        let git_add = CommandLine::create("git", ["pull"].to_vec());
+        let result = Exec::status(&git_add, Some(ConfyUtil::get_git_configuration_dir()));
+    
+        if !result {
+            log::error!("Could not pull {:?}", &ConfyUtil::get_git_configuration_dir());
+            panic!();
+        }
+    }
+    
+    pub fn auto_pull() {
+        let local_config = LocalConfig::get_config(None);
+    
+        if local_config.git_auto_sync {
+            Self::pull();
+        }
+    }
 
     pub fn open_in_editor(editor: &str, open_git_config: &bool) {
             let path = match open_git_config {

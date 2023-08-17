@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use crate::config::config::Config;
-use crate::config::pojo::base_config;
+use crate::config::pojo::base_config::{self, BaseConfig};
 use crate::config::pojo::env_config::EnvConfig;
 use crate::config::pojo::system_config::SystemConfig;
 use crate::env::env_copy::EnvCopy;
@@ -16,6 +16,7 @@ pub struct Env {}
 
 impl Env {
     pub fn add(params: &EnvParamsAddRemove) {
+        Config::auto_pull();
         let env_path = EnvPath::from_local(&params.path);
 
         let mut env_config = Self::get_env_config(&params.env_config);
@@ -30,6 +31,7 @@ impl Env {
     }
 
     pub fn remove(params: &EnvParamsAddRemove) {
+        Config::auto_pull();
         let env_path = EnvPath::from_local(&params.path);
 
         let mut env_config = Self::get_env_config(&params.env_config);
@@ -115,6 +117,7 @@ impl Env {
     }
 
     pub fn sync() {
+        Config::auto_pull();
         let system_config = SystemConfig::get_system_config();
 
         let mut env_paths = BTreeSet::new();
@@ -144,6 +147,7 @@ impl Env {
     }
 
     pub fn config_add(params: &EnvParamsConfigAddRemove) {
+        Config::auto_pull();
         if !EnvConfig::config_exists(&params.config) {
             println!("Config {} not found", &params.config);
 
@@ -159,6 +163,7 @@ impl Env {
     }
 
     pub fn config_remove(params: &EnvParamsConfigAddRemove) {
+        Config::auto_pull();
         let mut system_config = SystemConfig::get_system_config();
         system_config.env_config.configs.remove(&params.config);
         base_config::save_config(&system_config);
