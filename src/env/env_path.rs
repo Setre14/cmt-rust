@@ -1,15 +1,13 @@
 use std::path::PathBuf;
 use std::fs;
 
-use serde::{Serialize, Deserialize};
-
 use crate::config::pojo::env_config::EnvConfig;
 use crate::config::pojo::base_config::BaseConfig;
 use crate::util::path_util::PathUtil;
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, Clone, PartialOrd, Eq, Ord)]
+#[derive(Debug, PartialEq, Clone, PartialOrd, Eq, Ord)]
 pub struct EnvPath {
-    path: String
+    pub path: String
 }
 
 impl EnvPath {

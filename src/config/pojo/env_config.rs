@@ -11,7 +11,7 @@ pub struct EnvConfig {
     #[serde(skip_serializing, default)]
     pub file_name: String,
     #[serde(default)]
-    pub paths: BTreeSet<EnvPath>,
+    pub paths: BTreeSet<String>,
 }
 
 impl BaseConfig for EnvConfig {
@@ -70,5 +70,21 @@ impl EnvConfig {
         let configs = Self::get_configs();
 
         configs.contains(&config.to_string())
+    }
+
+    pub fn add_path(&mut self, env_path: &EnvPath) {
+        self.paths.insert(env_path.path.clone());
+    }
+
+    pub fn remove_path(&mut self, env_path: &EnvPath) {
+        self.paths.remove(&env_path.path);
+    }
+
+    pub fn contains_path(&self, env_path: &EnvPath) -> bool {
+        self.paths.contains(&env_path.path)
+    }
+
+    pub fn get_paths(&self) -> Vec<EnvPath> {
+        self.paths.iter().map(|p| EnvPath{path: p.to_string()}).collect()
     }
 }

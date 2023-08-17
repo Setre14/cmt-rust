@@ -20,7 +20,7 @@ impl Env {
 
         EnvCopy::copy_to_remote(&env_path);
 
-        env_config.paths.insert(env_path.clone());
+        env_config.add_path(&env_path);
     
         base_config::save_config(&env_config);
     }
@@ -29,7 +29,7 @@ impl Env {
         let env_path = EnvPath::from_local(&params.path);
 
         let mut env_config = Self::get_env_config(&params.env_config);
-        env_config.paths.remove(&env_path);
+        env_config.remove_path(&env_path);
         base_config::save_config(&env_config);
 
         let env_configs = EnvConfig::get_configs();
@@ -38,7 +38,7 @@ impl Env {
         for env_conf in env_configs {
             let config = EnvConfig::get_env_config(&env_conf);
 
-            if config.paths.contains(&env_path) {
+            if config.contains_path(&env_path) {
                 log::info!("'{}' is still references in env config '{}' - will not be delted from remote", &params.path, &env_conf);
                 remove = false;
                 break;
@@ -78,7 +78,7 @@ impl Env {
         let mut env_paths = BTreeSet::new();
         for env_config in system_config.env_config.configs {
             let config = EnvConfig::get_env_config(&env_config);
-            env_paths.extend(config.paths);
+            env_paths.extend(config.get_paths());
         }
 
         for env_path in env_paths {
@@ -92,7 +92,7 @@ impl Env {
         let mut env_paths = BTreeSet::new();
         for env_config in system_config.env_config.configs {
             let config = EnvConfig::get_env_config(&env_config);
-            env_paths.extend(config.paths);
+            env_paths.extend(config.get_paths());
         }
 
         for env_path in env_paths {
