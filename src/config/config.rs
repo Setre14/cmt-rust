@@ -65,6 +65,32 @@ impl Config {
         base_config::save_config(&settings);
     }
 
+    pub fn commit_push(message: Option<String>) {    
+        let commit_message = message.unwrap_or("Automatic update".to_string());
+        let cmt_commit_message = format!("Cmt: {}", &commit_message);
+    
+        log::debug!("Commit message for update: {}", cmt_commit_message);
+    
+        let git_add = CommandLine::create("git", ["add", "."].to_vec());
+        Exec::status(&git_add, Some(ConfyUtil::get_git_configuration_dir()));
+    
+        let git_commit = CommandLine::create("git", ["commit", "-m", &cmt_commit_message].to_vec());
+        let result = Exec::status(&git_commit, Some(ConfyUtil::get_git_configuration_dir()));
+        if result {
+            let git_push = CommandLine::create("git", ["push"].to_vec());
+            Exec::status(&git_push, Some(ConfyUtil::get_git_configuration_dir()));
+        }
+    }
+    
+    pub fn auto_commit_push(message: Option<String>) {
+        let local_config = LocalConfig::get_config(None);
+    
+        if local_config.git_auto_sync {
+            Self::commit_push(message);
+        }
+    }
+    
+
     pub fn open_in_editor(editor: &str, open_git_config: &bool) {
             let path = match open_git_config {
                 true => ConfyUtil::get_git_configuration_dir(),

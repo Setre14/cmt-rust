@@ -1,5 +1,6 @@
 use std::collections::BTreeSet;
 
+use crate::config::config::Config;
 use crate::config::pojo::base_config;
 use crate::config::pojo::env_config::EnvConfig;
 use crate::config::pojo::system_config::SystemConfig;
@@ -23,6 +24,8 @@ impl Env {
         env_config.add_path(&env_path);
     
         base_config::save_config(&env_config);
+
+        Config::auto_commit_push(Some(format!("Add path: '{}'", env_path.path)));
     }
 
     pub fn remove(params: &EnvParamsAddRemove) {
@@ -48,6 +51,7 @@ impl Env {
         if remove {
             env_path.delte_from_remote();
         }
+        Config::auto_commit_push(Some(format!("Remove path: '{}'", env_path.path)));
     }
 
     fn get_env_config(config: &Option<String>) -> EnvConfig {
@@ -98,6 +102,7 @@ impl Env {
         for env_path in env_paths {
             EnvCopy::copy_to_remote(&env_path);
         }
+        Config::auto_commit_push(Some("Sync env files".to_string()));
     }
 
     pub fn config_list(params: &EnvParamsConfigList) {
@@ -126,11 +131,13 @@ impl Env {
         let mut system_config = SystemConfig::get_system_config();
         system_config.env_config.configs.insert(params.config.clone());
         base_config::save_config(&system_config);
+        Config::auto_commit_push(Some(format!("Add env config: '{}'", &params.config)));
     }
 
     pub fn config_remove(params: &EnvParamsConfigAddRemove) {
         let mut system_config = SystemConfig::get_system_config();
         system_config.env_config.configs.remove(&params.config);
         base_config::save_config(&system_config);
+        Config::auto_commit_push(Some(format!("Remove env config: '{}'", &params.config)));
     }
 }
