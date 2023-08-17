@@ -10,6 +10,7 @@ use crate::env::params::env_params_add_remove::EnvParamsAddRemove;
 
 use super::params::env_params_config_add_remove::EnvParamsConfigAddRemove;
 use super::params::env_params_config_list::EnvParamsConfigList;
+use super::params::env_params_list::EnvParamsList;
 
 pub struct Env {}
 
@@ -52,6 +53,31 @@ impl Env {
             env_path.delte_from_remote();
         }
         Config::auto_commit_push(Some(format!("Remove path: '{}'", env_path.path)));
+    }
+
+    pub fn list(params: &EnvParamsList) {
+        let mut env_configs = Vec::new();
+
+        if params.config.is_some() {
+            env_configs.push(Self::get_env_config(&params.config));
+        } else {
+            let system_config = SystemConfig::get_system_config();
+
+            for config in system_config.env_config.configs {
+                env_configs.push(Self::get_env_config(&Some(config)));
+            }
+        }
+
+        let mut paths = BTreeSet::new();
+        for env_config in env_configs {
+            for env_path in env_config.get_paths() {
+                paths.insert(env_path.clone());
+            } 
+        }
+
+        for env_path in paths  {
+            println!("{}", env_path.path)
+        }
     }
 
     fn get_env_config(config: &Option<String>) -> EnvConfig {

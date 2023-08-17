@@ -1,4 +1,4 @@
-use clap::{Args};
+use clap::Args;
 
 use crate::config::params::config_params_update::ConfigParamsUpdate;
 

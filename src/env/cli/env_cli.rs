@@ -14,6 +14,9 @@ impl EnvCli {
             EnvCliCommand::Remove { params } => {
                 Env::remove(params);
             },
+            EnvCliCommand::List { params } => {
+                Env::list(params);
+            },
             EnvCliCommand::Apply {} => {
                 Env::apply();
             },

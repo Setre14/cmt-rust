@@ -9,7 +9,7 @@ use walkdir::WalkDir;
 
 use crate::config::pojo::env_config::EnvConfig;
 use crate::config::pojo::base_config::BaseConfig;
-use crate::config::pojo::local_config::{self, LocalConfig};
+use crate::config::pojo::local_config::LocalConfig;
 use crate::config::pojo::system_config::SystemConfig;
 use crate::util::path_util::PathUtil;
 
