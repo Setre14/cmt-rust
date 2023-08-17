@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use serde::{de, Serialize};
 use confy;
 
-use crate::{util::{confy_util::ConfyUtil, path_util::PathUtil}, config::pojo::{local_config::LocalConfig, system_config::{self, SystemConfig}}};
+use crate::{util::{confy_util::ConfyUtil, path_util::PathUtil}, config::pojo::local_config::LocalConfig};
 
 pub trait BaseConfig<T=Self> 
 where T:  Serialize + de::DeserializeOwned + Clone + std::fmt::Debug

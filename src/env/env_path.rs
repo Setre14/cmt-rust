@@ -1,4 +1,4 @@
-use std::io::BufReader;
+use std::io::{BufReader, BufRead};
 use std::{path::PathBuf, fs::File};
 use std::fs;
 
@@ -86,16 +86,35 @@ impl EnvPath {
         } else {
             log::info!("Copy file from '{:#?}' to '{:#?}'", source, destination);
 
-
-
             let handlebars = Handlebars::new();
 
-            let template_contents = fs::read_to_string(source)
-            .expect("Should have been able to read the file");
+            let file = File::open(source).unwrap();
+            let lines = BufReader::new(file).lines();
+            let mut templated_lines = Vec::new();
 
-            let writer = File::create(&destination).unwrap();
-            let _ = handlebars.render_template_to_write(&template_contents, &data, writer);
 
+            let mut first = true;
+            let comment_header = "cmt-comment";
+            let mut comment = comment_header.to_string();
+            for res_line in lines {
+                let line = res_line.unwrap();
+
+                if first && line.contains(&comment) {
+                    comment = line.rsplit_once("=").unwrap().1.to_string();
+                }
+
+                let templated_line = handlebars.render_template(&line, &data).unwrap();
+
+                if !line.eq(&templated_line) && !comment.eq(comment_header) {
+                    templated_lines.push(format!("{} template={}", comment, &line));
+                }
+
+                templated_lines.push(templated_line);
+                first = false;
+            }
+
+
+            fs::write(destination, templated_lines.join("\n")).expect("");
         }
 
         // Self::copy(&local_path, &remote_path);
