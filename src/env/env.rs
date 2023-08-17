@@ -3,6 +3,7 @@ use std::collections::BTreeSet;
 use crate::config::pojo::base_config;
 use crate::config::pojo::env_config::EnvConfig;
 use crate::config::pojo::system_config::SystemConfig;
+use crate::env::env_copy::EnvCopy;
 use crate::env::env_path::EnvPath;
 use crate::env::params::env_params_add_remove::EnvParamsAddRemove;
 
@@ -17,7 +18,7 @@ impl Env {
 
         let mut env_config = Self::get_env_config(&params.env_config);
 
-        env_path.copy_to_remote();
+        EnvCopy::copy_to_remote(&env_path);
 
         env_config.paths.insert(env_path.clone());
     
@@ -81,7 +82,7 @@ impl Env {
         }
 
         for env_path in env_paths {
-            env_path.copy_to_local();
+            EnvCopy::copy_to_local(&env_path);
         }
     }
 
@@ -95,7 +96,7 @@ impl Env {
         }
 
         for env_path in env_paths {
-            env_path.copy_to_remote();
+            EnvCopy::copy_to_remote(&env_path);
         }
     }
 
