@@ -16,7 +16,7 @@ impl Config {
     pub fn init(params: &ConfigParamsInit) {
         log::info!("Init commnand");
 
-        let mut settings: LocalConfig = LocalConfig::get_config(None);
+        let settings: LocalConfig = LocalConfig::get_config(None);
 
         // let git_config_dir = settings.git_config_dir.clone();
         let git_config_dir = ConfyUtil::get_git_configuration_dir();
@@ -33,8 +33,6 @@ impl Config {
         let git_config_dir_str = PathUtil::to_string(&git_config_dir);
         let git_clone = CommandLine::create("git", ["clone", &params.url, &git_config_dir_str].to_vec());
         Exec::status(&git_clone, None);
-
-        settings.git_clone_url = params.url.clone();
 
         base_config::save_config(&settings);
 

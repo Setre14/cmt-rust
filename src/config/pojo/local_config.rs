@@ -14,12 +14,12 @@ pub struct LocalConfig {
     pub debug_level: u8,
     #[serde(default = "LocalConfig::get_default_git_auto_sync")]
     pub git_auto_sync: bool,
-    #[serde(default)]
-    pub git_clone_url: String,
     #[serde(default = "LocalConfig::get_default_system_config")]
     pub system_config: String,
     #[serde(default = "LocalConfig::get_default_editor")]
     pub editor: String,
+    #[serde(default = "LocalConfig::get_default_env_template_strict")]
+    pub env_template_strict: bool,
 }
 
 impl Default for LocalConfig {
@@ -28,9 +28,9 @@ impl Default for LocalConfig {
             file_name: "local".to_string(),
             debug_level: LocalConfig::get_default_debug_level(),
             git_auto_sync: LocalConfig::get_default_git_auto_sync(),
-            git_clone_url: "".to_string(),
-            system_config: "system".to_string(),
-            editor: "code".to_string()
+            system_config: LocalConfig::get_default_system_config(),
+            editor: LocalConfig::get_default_editor(),
+            env_template_strict: LocalConfig::get_default_env_template_strict()
         }
     }
 }
@@ -63,10 +63,14 @@ impl LocalConfig {
     }
 
     pub fn get_default_system_config() -> String {
-        Exec::get_hostname()
+        format!("system-{}", Exec::get_hostname())
     }
 
     pub fn get_default_editor() -> String {
         "code".to_string()
+    }
+
+    pub fn get_default_env_template_strict() -> bool {
+        true
     }
 }

@@ -75,8 +75,6 @@ impl Env {
     pub fn apply() {
         let system_config = SystemConfig::get_system_config();
 
-
-        println!("{:?}", &system_config);
         base_config::save_config(&system_config);
 
         let mut env_paths = BTreeSet::new();

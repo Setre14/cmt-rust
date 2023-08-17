@@ -4,10 +4,12 @@ use std::fs;
 
 use handlebars::Handlebars;
 use serde::{Serialize, Deserialize};
+use serde_json::json;
 use walkdir::WalkDir;
 
 use crate::config::pojo::env_config::EnvConfig;
 use crate::config::pojo::base_config::BaseConfig;
+use crate::config::pojo::local_config::{self, LocalConfig};
 use crate::config::pojo::system_config::SystemConfig;
 use crate::util::path_util::PathUtil;
 
@@ -91,13 +93,25 @@ impl EnvCopy {
         env_path.delte_from_local();
 
         let system_config = SystemConfig::get_system_config();
+        let local_config = LocalConfig::get_config(None);
+
+        let mut data = json!("{}");
+
         let mut values_file = EnvConfig::get_dir();
         values_file.push(&system_config.env_config.template_values);
-        let file = File::open(values_file).unwrap();
-        let reader = BufReader::new(file);
-    
-        let data: serde_json::Value = serde_json::from_reader(reader).unwrap();
+        if values_file.is_file() {
+            let file = File::open(values_file).unwrap();
+            let reader = BufReader::new(file);
+            data = serde_json::from_reader(reader).unwrap();
+        } else {
+            log::warn!("Values file '{:?}' does not exist -> create empty values file", system_config.env_config.template_values);
+            fs::write(&values_file, "{}").expect("");
+
+        }
         log::debug!("data: {:?}", data);
+
+        let mut handlebars = Handlebars::new();
+        handlebars.set_strict_mode(local_config.env_template_strict);
 
         let mut files = Vec::new();
         let remote_path = env_path.get_remote_path();
@@ -123,10 +137,7 @@ impl EnvCopy {
             let _ = fs::create_dir_all(dest_dir.clone());
             let _ = fs::copy(&source, &destination);
 
-
-            let handlebars = Handlebars::new();
-
-            let file = File::open(source).unwrap();
+            let file = File::open(&source).unwrap();
             let lines = BufReader::new(file).lines();
             let mut templated_lines = Vec::new();
 
@@ -141,7 +152,16 @@ impl EnvCopy {
                     comment = line.rsplit_once('=').unwrap().1.to_string();
                 }
 
-                let templated_line = handlebars.render_template(&line, &data).unwrap();
+                let render = handlebars.render_template(&line, &data);
+
+                if render.is_err() {
+                    log::error!("Failed to template file '{:?}'", &source);
+                    log::error!("{:?}", render.unwrap_err());
+
+                    std::process::exit(1);
+                }
+
+                let templated_line = render.unwrap();
 
                 if !line.eq(&templated_line) && !comment.eq(comment_header) {
                     templated_lines.push(format!("{} template={}", comment, &line));

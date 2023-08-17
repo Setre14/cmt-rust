@@ -2,6 +2,8 @@ use std::collections::BTreeSet;
 
 use serde::{Serialize, Deserialize};
 
+use crate::util::exec::Exec;
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SystemPackageConfig {
     #[serde(default = "SystemPackageConfig::get_default_package_config")]
@@ -19,7 +21,7 @@ impl Default for SystemPackageConfig {
 impl SystemPackageConfig {
     pub fn get_default_package_config() -> BTreeSet<String> {
         let mut configs: BTreeSet<String> = BTreeSet::new();
-        configs.insert("package".to_string());
+        configs.insert(format!("package-{}", Exec::get_hostname()));
         configs
     }
 }
