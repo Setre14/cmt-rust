@@ -12,6 +12,8 @@ use env::cli::env_cli::EnvCli;
 use env::cli::env_cli_command::EnvCliCommand;
 use config::pojo::local_config::LocalConfig;
 use config::pojo::base_config::BaseConfig;
+use pkg::cli::pkg_cli::PkgCli;
+use pkg::cli::pkg_cli_command::PkgCliCommand;
 use pkg::dnf::cli::dnf_cli::DnfCli;
 use pkg::dnf::cli::dnf_cli_command::DnfCliCommand;
 
@@ -58,9 +60,9 @@ enum Command {
     },
 
     /// Interact with dnf package manager
-    Dnf {
+    Pkg {
         #[command(subcommand)]
-        command: DnfCliCommand,
+        command: PkgCliCommand,
     }
 }
 
@@ -92,8 +94,8 @@ fn main() {
         Some(Command::Env { command }) => {
             EnvCli::handle_command(command)
         },
-        Some(Command::Dnf { command }) => {
-            DnfCli::handle_command(command)
+        Some(Command::Pkg { command }) => {
+            PkgCli::handle_command(command)
         },
         None => {} 
     }
