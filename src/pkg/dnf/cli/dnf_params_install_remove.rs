@@ -1,13 +1,11 @@
 use clap::Args;
 
+use crate::pkg::cli::pkg_params_install_remove::PkgParamsInstallRemove;
+
 #[derive(Args)]
 pub struct DnfParamsInstallRemove {
-    /// Package to install
-    pub package: String,
-
-    /// Pkg config to use, default first in system config list
-    #[arg(short = 'c', long)]
-    pub pkg_config: Option<String>,
+    #[command(flatten)]
+    pub pkg_params: PkgParamsInstallRemove,
 
     /// automatically answer yes for all questions
     #[arg(short = 'y', long)]

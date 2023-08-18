@@ -1,8 +1,8 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, collections::BTreeSet};
 
 use serde::{Serialize, Deserialize};
 
-use crate::{config::pojo::base_config::BaseConfig, util::confy_util::ConfyUtil};
+use crate::{config::pojo::base_config::BaseConfig, util::confy_util::ConfyUtil, pkg::pkgm::Pkgm};
 
 use super::{pkg::dnf_config::DnfConfig, system_config::SystemConfig};
 
@@ -55,5 +55,17 @@ impl PkgConfig {
         };
 
         PkgConfig::get_config(Some(format!("pkg/{}", config_name)))
+    }
+
+    pub fn get_packages(&self, pkgm: &Pkgm) -> BTreeSet<String> {
+        match pkgm {
+            Pkgm::DNF => self.dnf_config.packages.clone()
+        }
+    }
+
+    pub fn set_packages(&mut self, pkgm: &Pkgm, packages: &BTreeSet<String>) {
+        match pkgm {
+            Pkgm::DNF => self.dnf_config.packages = packages.clone()
+        }
     }
 }
