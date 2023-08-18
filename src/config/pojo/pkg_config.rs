@@ -4,7 +4,7 @@ use serde::{Serialize, Deserialize};
 
 use crate::{config::pojo::base_config::BaseConfig, util::confy_util::ConfyUtil, pkg::pkgm::Pkgm};
 
-use super::{pkg::{dnf_config::DnfConfig, pacman_config::PacmanConfig}, system_config::SystemConfig};
+use super::{pkg::{dnf_config::DnfConfig, pacman_config::PacmanConfig, yay_config::YayConfig}, system_config::SystemConfig};
 
 
 
@@ -16,6 +16,8 @@ pub struct PkgConfig {
     pub dnf_config: DnfConfig,
     #[serde(default)]
     pub pacman_config: PacmanConfig,
+    #[serde(default)]
+    pub yay_config: YayConfig,
 }
 
 impl BaseConfig for PkgConfig {
@@ -63,6 +65,7 @@ impl PkgConfig {
         match pkgm {
             Pkgm::DNF => self.dnf_config.packages.clone(),
             Pkgm::PACMAN => self.pacman_config.packages.clone(),
+            Pkgm::YAY => self.yay_config.packages.clone(),
         }
     }
 
@@ -70,6 +73,7 @@ impl PkgConfig {
         match pkgm {
             Pkgm::DNF => self.dnf_config.packages = packages.clone(),
             Pkgm::PACMAN => self.pacman_config.packages = packages.clone(),
+            Pkgm::YAY => self.yay_config.packages = packages.clone(),
         }
     }
 }
