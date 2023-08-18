@@ -1,6 +1,6 @@
 use crate::{config::{pojo::{base_config, pkg_config::PkgConfig, system_config::SystemConfig}, config::Config}, util::{exec::Exec, command_line::CommandLine}};
 
-use super::params::dnf_params_install_remove::DnfParamsInstallRemove;
+use super::cli::dnf_params_install_remove::DnfParamsInstallRemove;
 
 
 pub struct Dnf {}

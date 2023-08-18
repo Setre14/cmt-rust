@@ -1,9 +1,9 @@
 use clap::Subcommand;
 
-use crate::env::params::env_params_add_remove::EnvParamsAddRemove;
-use crate::env::params::env_params_config_add_remove::EnvParamsConfigAddRemove;
-use crate::env::params::env_params_config_list::EnvParamsConfigList;
-use crate::env::params::env_params_list::EnvParamsList;
+use crate::env::cli::env_params_add_remove::EnvParamsAddRemove;
+use crate::env::cli::env_params_config_add_remove::EnvParamsConfigAddRemove;
+use crate::env::cli::env_params_config_list::EnvParamsConfigList;
+use crate::env::cli::env_params_list::EnvParamsList;
 
 #[derive(Subcommand)]
 pub enum EnvCliCommand {

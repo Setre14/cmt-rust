@@ -5,8 +5,8 @@ pub mod pkg;
 
 use clap::{Parser, Subcommand};
 
-use config::params::config_params_init::ConfigParamsInit;
-use config::params::config_params_update::ConfigParamsUpdate;
+use config::cli::config_params_init::ConfigParamsInit;
+use config::cli::config_params_update::ConfigParamsUpdate;
 use config::config::Config;
 use env::cli::env_cli::EnvCli;
 use env::cli::env_cli_command::EnvCliCommand;
@@ -14,8 +14,6 @@ use config::pojo::local_config::LocalConfig;
 use config::pojo::base_config::BaseConfig;
 use pkg::cli::pkg_cli::PkgCli;
 use pkg::cli::pkg_cli_command::PkgCliCommand;
-use pkg::dnf::cli::dnf_cli::DnfCli;
-use pkg::dnf::cli::dnf_cli_command::DnfCliCommand;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]

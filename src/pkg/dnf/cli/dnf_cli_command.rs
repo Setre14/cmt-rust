@@ -1,6 +1,6 @@
 use clap::Subcommand;
 
-use crate::pkg::dnf::params::dnf_params_install_remove::DnfParamsInstallRemove;
+use crate::pkg::dnf::cli::dnf_params_install_remove::DnfParamsInstallRemove;
 
 #[derive(Subcommand)]
 pub enum DnfCliCommand {

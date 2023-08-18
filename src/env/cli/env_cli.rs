@@ -1,5 +1,5 @@
 use crate::env::cli::env_cli_command::EnvCliCommand;
-use crate::env::env::{Env};
+use crate::env::env::Env;
 
 use super::env_cli_command::EnvConfigCliCommand;
 

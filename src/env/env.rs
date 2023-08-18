@@ -6,11 +6,11 @@ use crate::config::pojo::env_config::EnvConfig;
 use crate::config::pojo::system_config::SystemConfig;
 use crate::env::env_copy::EnvCopy;
 use crate::env::env_path::EnvPath;
-use crate::env::params::env_params_add_remove::EnvParamsAddRemove;
+use crate::env::cli::env_params_add_remove::EnvParamsAddRemove;
 
-use super::params::env_params_config_add_remove::EnvParamsConfigAddRemove;
-use super::params::env_params_config_list::EnvParamsConfigList;
-use super::params::env_params_list::EnvParamsList;
+use super::cli::env_params_config_add_remove::EnvParamsConfigAddRemove;
+use super::cli::env_params_config_list::EnvParamsConfigList;
+use super::cli::env_params_list::EnvParamsList;
 
 pub struct Env {}
 

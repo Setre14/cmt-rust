@@ -1,8 +1,8 @@
 use std::path::Path;
 use std::fs;
 
-use crate::config::params::config_params_init::ConfigParamsInit;
-use crate::config::params::config_params_update::ConfigParamsUpdate;
+use crate::config::cli::config_params_init::ConfigParamsInit;
+use crate::config::cli::config_params_update::ConfigParamsUpdate;
 use crate::config::pojo::local_config::LocalConfig;
 use crate::config::pojo::base_config::{BaseConfig, self};
 use crate::util::command_line::CommandLine;
