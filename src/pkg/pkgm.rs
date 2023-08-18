@@ -1,4 +1,5 @@
 #[derive(Debug)]
 pub enum Pkgm {
-    DNF
+    DNF,
+    PACMAN
 }

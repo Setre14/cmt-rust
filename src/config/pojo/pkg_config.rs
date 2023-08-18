@@ -4,7 +4,7 @@ use serde::{Serialize, Deserialize};
 
 use crate::{config::pojo::base_config::BaseConfig, util::confy_util::ConfyUtil, pkg::pkgm::Pkgm};
 
-use super::{pkg::dnf_config::DnfConfig, system_config::SystemConfig};
+use super::{pkg::{dnf_config::DnfConfig, pacman_config::PacmanConfig}, system_config::SystemConfig};
 
 
 
@@ -14,6 +14,8 @@ pub struct PkgConfig {
     pub file_name: String,
     #[serde(default)]
     pub dnf_config: DnfConfig,
+    #[serde(default)]
+    pub pacman_config: PacmanConfig,
 }
 
 impl BaseConfig for PkgConfig {
@@ -59,13 +61,15 @@ impl PkgConfig {
 
     pub fn get_packages(&self, pkgm: &Pkgm) -> BTreeSet<String> {
         match pkgm {
-            Pkgm::DNF => self.dnf_config.packages.clone()
+            Pkgm::DNF => self.dnf_config.packages.clone(),
+            Pkgm::PACMAN => self.pacman_config.packages.clone(),
         }
     }
 
     pub fn set_packages(&mut self, pkgm: &Pkgm, packages: &BTreeSet<String>) {
         match pkgm {
-            Pkgm::DNF => self.dnf_config.packages = packages.clone()
+            Pkgm::DNF => self.dnf_config.packages = packages.clone(),
+            Pkgm::PACMAN => self.pacman_config.packages = packages.clone(),
         }
     }
 }

@@ -8,25 +8,31 @@ pub struct Pkg {}
 impl Pkg {
     pub fn install(pkgm: Pkgm, command_line: &CommandLine, params: &PkgParamsInstallRemove) {
         Config::auto_pull();
+        let package = params.package.clone().unwrap();
+
         let mut pkg_config = PkgConfig::get_pkg_config(&params.pkg_config);
         let mut packages = pkg_config.get_packages(&pkgm);
 
-        packages.insert(params.package.clone());
+        packages.insert(package.clone());
 
-        let _ = Exec::status(&command_line, None);
+        let result = Exec::status(&command_line, None);
     
-        pkg_config.set_packages(&pkgm, &packages);
-        base_config::save_config(&pkg_config);
-
-        Config::auto_commit_push(Some(format!("Add {:?} package: '{}'", &pkgm, &params.package)));
+        if result {
+            pkg_config.set_packages(&pkgm, &packages);
+            base_config::save_config(&pkg_config);
+    
+            Config::auto_commit_push(Some(format!("Add {:?} package: '{}'", &pkgm, &package)));
+        }
     }
 
     pub fn remove(pkgm: Pkgm, command_line: &CommandLine, params: &PkgParamsInstallRemove) {
         Config::auto_pull();
+        let package = params.package.clone().unwrap();
+
         let mut pkg_config: PkgConfig = PkgConfig::get_pkg_config(&params.pkg_config);
         let mut packages = pkg_config.get_packages(&pkgm);
 
-        packages.remove(&params.package);
+        packages.remove(&package);
         pkg_config.set_packages(&pkgm, &packages);
         base_config::save_config(&pkg_config);
 
@@ -37,8 +43,8 @@ impl Pkg {
             let config = PkgConfig::get_pkg_config(&Some(pkg_conf.clone()));
             let packages = config.get_packages(&pkgm);
 
-            if packages.contains(&params.package) {
-                log::info!("'{}' is still references in pkg config '{}' - will not be delted from system", &params.package, &pkg_conf);
+            if packages.contains(&package) {
+                log::info!("'{}' is still references in pkg config '{}' - will not be delted from system", &package, &pkg_conf);
                 remove = false;
                 break;
             }
@@ -48,7 +54,7 @@ impl Pkg {
             let _ = Exec::status(&command_line, None);
         }
 
-        Config::auto_commit_push(Some(format!("Remove {:?} package: '{}'", &pkgm, &params.package)));
+        Config::auto_commit_push(Some(format!("Remove {:?} package: '{}'", &pkgm, &package)));
     }
 
     pub fn update(_pkgm: Pkgm, command_line: &CommandLine) {
