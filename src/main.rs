@@ -1,29 +1,19 @@
-extern crate clap;
-extern crate dirs;
-extern crate serde;
-extern crate fs_extra;
-extern crate log;
-extern crate stderrlog;
-
-// use log;
-// use stderrlog;
-
-mod config;
-mod git_config;
-mod util;
-mod pkgm;
-mod env;
+pub mod config;
+pub mod util;
+pub mod env;
+pub mod pkg;
 
 use clap::{Parser, Subcommand};
 
-use config::base;
-use config::app;
-// use env;
-use env::Env;
-use pkgm::dnf;
-use pkgm::dnf::Dnf;
-use pkgm::pacman;
-use pkgm::pacman::Pacman;
+use config::cli::config_params_init::ConfigParamsInit;
+use config::cli::config_params_update::ConfigParamsUpdate;
+use config::config::Config;
+use env::cli::env_cli::EnvCli;
+use env::cli::env_cli_command::EnvCliCommand;
+use config::pojo::local_config::LocalConfig;
+use config::pojo::base_config::BaseConfig;
+use pkg::cli::pkg_cli::PkgCli;
+use pkg::cli::pkg_cli_command::PkgCliCommand;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -32,88 +22,79 @@ struct Cli {
     #[arg(short, long)]
     quiet: bool,
     /// Verbose mode (-v, -vv, -vvv, etc)
-    #[arg(short, long, action = clap::ArgAction::Count)]
+    #[arg(short, long, action = clap::ArgAction::Count, global = true)]
     verbose: u8,
 
     #[command(subcommand)]
     command: Option<Command>,
 }
 
+
 #[derive(Subcommand)]
 enum Command {
-    /// Init app config and clone git config
+    /// Init local config and clone git config
     Init {
-        /// Git clone url
-        url: String,
-
-        /// Destination for git clone, default: ~/.config/cmt-rust
-        #[arg(short, long)]
-        dest: Option<String>,
-
-        /// Branch to checkout otherwise default branch is used
-        #[arg(short, long)]
-        branch: Option<String>,
-
-        /// Remove folder if destination already exists
-        #[arg(short, long)]
-        force: bool,
+        #[command(flatten)]
+        params: ConfigParamsInit,
     },
 
-    /// Interact with git config
-    Config {
-        #[command(subcommand)]
-        command: git_config::Command,
+    /// Update local config
+    Update {
+        #[command(flatten)]
+        params: ConfigParamsUpdate,
     },
 
-    /// Add, remove and sync files and folders
+    /// Open config in editor
+    Open {
+        /// Open git config
+        #[arg(short = 'g', long)]
+        open_git_config: bool,
+    },
+
+    /// Manipulate env files
     Env {
         #[command(subcommand)]
-        command: env::Command,
+        command: EnvCliCommand,
     },
 
-    /// Install, remove and update dnf packages
-    Dnf {
+    /// Interact with dnf package manager
+    Pkg {
         #[command(subcommand)]
-        command: dnf::Command,
-    },
-
-    /// Install, remove and update pacman packages
-    Pacman {
-        #[command(subcommand)]
-        command: pacman::Command,
-    },
+        command: PkgCliCommand,
+    }
 }
 
+
 fn main() {
-    let conf = app::get_conf();
+    let settings = LocalConfig::get_config(None);
 
     let cli = Cli::parse();
 
     stderrlog::new()
         .module(module_path!())
         .quiet(cli.quiet)
-        .verbosity((cli.verbose + conf.debug_level) as usize)
+        .verbosity((cli.verbose + settings.debug_level) as usize)
         .show_module_names(true)
         // .timestamp(stderrlog::Timestamp::Second)
         .init()
         .unwrap();
     
     match &cli.command {
-        Some(Command::Init { url, dest, branch, force }) => {
-            git_config::init(url, dest, branch, *force);
+        Some(Command::Init { params }) => {
+            Config::init(params);
         },
-        Some(Command::Config {command}) => {
-            git_config::handle_command(command)
+        Some(Command::Update { params }) => {
+            Config::update(params);
         },
-        Some(Command::Env {command}) => {
-            Env::handle_command(command)
+        Some(Command::Open { open_git_config }) => {
+            Config::open_in_editor(&settings.editor, open_git_config)
         },
-        Some(Command::Pacman {command}) => {
-            Pacman::handle_command(command)
+        Some(Command::Env { command }) => {
+            EnvCli::handle_command(command)
         },
-        Some(Command::Dnf {command}) => {
-            Dnf::handle_command(command)
+        Some(Command::Pkg { command }) => {
+            PkgCli::handle_command(command)
         },
-        None => {}
+        None => {} 
     }
 }
