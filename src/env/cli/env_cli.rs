@@ -1,3 +1,4 @@
+use crate::config::pojo::system_config::SystemConfig;
 use crate::env::cli::env_cli_command::EnvCliCommand;
 use crate::env::env::Env;
 use crate::system_config::cli::system_config_cli_command::SystemConfigCliCommand;
@@ -25,13 +26,13 @@ impl EnvCli {
             EnvCliCommand::Config { config_command } => {
                 match config_command {
                     SystemConfigCliCommand::List { params } => {
-                        Env::config_list(params);
+                        SystemConfig::list(params);
                     },
                     SystemConfigCliCommand::Add { params } => {
-                        Env::config_add(params);
+                        SystemConfig::add(params);
                     },
                     SystemConfigCliCommand::Remove { params } => {
-                        Env::config_remove(params);
+                        SystemConfig::remove(params);
                     }
                 }
             }

@@ -2,9 +2,9 @@ use std::{path::PathBuf, collections::BTreeSet};
 
 use serde::{Serialize, Deserialize};
 
-use crate::{config::pojo::base_config::BaseConfig, util::{path_util::PathUtil, confy_util::ConfyUtil}};
+use crate::{config::{pojo::base_config::BaseConfig, config::Config}, util::{path_util::PathUtil, confy_util::ConfyUtil}, system_config::cli::{system_config_params_list::SystemConfigParamList, system_config_params_add_remove::SystemConfigParamAddRemove}};
 
-use super::{local_config::LocalConfig, system_env_config::SystemEnvConfig, system_package_config::SystemPackageConfig};
+use super::{local_config::LocalConfig, system_env_config::SystemEnvConfig, system_package_config::SystemPackageConfig, env_config::EnvConfig, base_config};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct SystemConfig {
@@ -49,5 +49,49 @@ impl SystemConfig {
         let mut env_configs: BTreeSet<String> = BTreeSet::new();
         env_configs.insert("env".to_string());
         env_configs
+    }
+
+    pub fn list(params: &SystemConfigParamList) {
+        Config::auto_pull();
+        let configs = match params.all {
+            true => EnvConfig::get_configs(),
+            false => {
+                let system_config = SystemConfig::get_system_config();
+                let mut configs = system_config.env_config.configs.clone();
+                configs.insert(system_config.env_config.main_config.clone());
+                configs            
+            }
+            
+        };
+
+        for env_config in configs  {
+            println!("{}", env_config)
+        }
+    }
+
+    pub fn add(params: &SystemConfigParamAddRemove) {
+        Config::auto_pull();
+        if !EnvConfig::config_exists(&params.config) {
+            println!("Config {} not found", &params.config);
+
+            println!("List of available configs:");
+            SystemConfig::list(&SystemConfigParamList { all: true });
+            std::process::exit(1);
+        }
+
+        let mut system_config = SystemConfig::get_system_config();
+        let mut configs = system_config.env_config.configs.clone();
+        configs.insert(params.config.clone());
+        system_config.env_config.configs = configs;
+        base_config::save_config(&system_config);
+        Config::auto_commit_push(Some(format!("Add env config: '{}'", &params.config)));
+    }
+
+    pub fn remove(params: &SystemConfigParamAddRemove) {
+        Config::auto_pull();
+        let mut system_config = SystemConfig::get_system_config();
+        system_config.env_config.configs.remove(&params.config);
+        base_config::save_config(&system_config);
+        Config::auto_commit_push(Some(format!("Remove env config: '{}'", &params.config)));
     }
 }
