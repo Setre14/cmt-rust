@@ -6,17 +6,20 @@ use crate::util::exec::Exec;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SystemEnvConfig {
+    #[serde(default = "SystemEnvConfig::get_default_env_config")]
+    pub main_config: String,
+    #[serde(default = "SystemEnvConfig::get_default_env_configs")]
+    pub configs: BTreeSet<String>,
     #[serde(default)]
     pub template_values: String,
-    #[serde(default = "SystemEnvConfig::get_default_env_config")]
-    pub configs: BTreeSet<String>,
 }
 
 impl Default for SystemEnvConfig {
     fn default() -> Self { 
         SystemEnvConfig {
+            main_config: Self::get_default_env_config(),
+            configs: Self::get_default_env_configs(),
             template_values: Self::get_default_template_values(),
-            configs: Self::get_default_env_config()
         }
     }
 }
@@ -26,9 +29,13 @@ impl SystemEnvConfig {
         format!("values-{}.json", Exec::get_hostname())
     }
 
-    pub fn get_default_env_config() -> BTreeSet<String> {
+    pub fn get_default_env_config() -> String {
+        return format!("env-{}", Exec::get_hostname());
+    }
+
+    pub fn get_default_env_configs() -> BTreeSet<String> {
         let mut configs: BTreeSet<String> = BTreeSet::new();
-        configs.insert(format!("env-{}", Exec::get_hostname()));
+        configs.insert(Self::get_default_env_config());
         configs
     }
 }

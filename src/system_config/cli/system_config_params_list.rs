@@ -1,7 +1,7 @@
 use clap::Args;
 
 #[derive(Args)]
-pub struct EnvParamsConfigList {
+pub struct SystemConfigParamList {
     /// List all available configs
     #[arg(short, long)]
     pub all: bool,

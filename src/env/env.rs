@@ -7,9 +7,9 @@ use crate::config::pojo::system_config::SystemConfig;
 use crate::env::env_copy::EnvCopy;
 use crate::env::env_path::EnvPath;
 use crate::env::cli::env_params_add_remove::EnvParamsAddRemove;
+use crate::system_config::cli::system_config_params_add_remove::SystemConfigParamAddRemove;
+use crate::system_config::cli::system_config_params_list::SystemConfigParamList;
 
-use super::cli::env_params_config_add_remove::EnvParamsConfigAddRemove;
-use super::cli::env_params_config_list::EnvParamsConfigList;
 use super::cli::env_params_list::EnvParamsList;
 
 pub struct Env {}
@@ -132,7 +132,7 @@ impl Env {
         Config::auto_commit_push(Some("Sync env files".to_string()));
     }
 
-    pub fn config_list(params: &EnvParamsConfigList) {
+    pub fn config_list(params: &SystemConfigParamList) {
         let system_config = SystemConfig::get_system_config();
 
         let configs = match params.all {
@@ -146,13 +146,13 @@ impl Env {
         }
     }
 
-    pub fn config_add(params: &EnvParamsConfigAddRemove) {
+    pub fn config_add(params: &SystemConfigParamAddRemove) {
         Config::auto_pull();
         if !EnvConfig::config_exists(&params.config) {
             println!("Config {} not found", &params.config);
 
             println!("List of available configs:");
-            Self::config_list(&EnvParamsConfigList { all: true });
+            Self::config_list(&SystemConfigParamList { all: true });
             std::process::exit(1);
         }
 
@@ -162,7 +162,7 @@ impl Env {
         Config::auto_commit_push(Some(format!("Add env config: '{}'", &params.config)));
     }
 
-    pub fn config_remove(params: &EnvParamsConfigAddRemove) {
+    pub fn config_remove(params: &SystemConfigParamAddRemove) {
         Config::auto_pull();
         let mut system_config = SystemConfig::get_system_config();
         system_config.env_config.configs.remove(&params.config);

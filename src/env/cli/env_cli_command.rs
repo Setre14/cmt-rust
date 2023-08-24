@@ -1,9 +1,8 @@
 use clap::Subcommand;
 
 use crate::env::cli::env_params_add_remove::EnvParamsAddRemove;
-use crate::env::cli::env_params_config_add_remove::EnvParamsConfigAddRemove;
-use crate::env::cli::env_params_config_list::EnvParamsConfigList;
 use crate::env::cli::env_params_list::EnvParamsList;
+use crate::system_config::cli::system_config_cli_command::SystemConfigCliCommand;
 
 #[derive(Subcommand)]
 pub enum EnvCliCommand {
@@ -37,26 +36,7 @@ pub enum EnvCliCommand {
     /// List, add and remove env config files
     Config {
         #[command(subcommand)]
-        config_command: EnvConfigCliCommand
+        config_command: SystemConfigCliCommand
     }
 
-}
-
-#[derive(Subcommand)]
-pub enum EnvConfigCliCommand {
-
-    List {
-        #[command(flatten)]
-        params: EnvParamsConfigList,
-    },
-
-    Add {
-        #[command(flatten)]
-        params: EnvParamsConfigAddRemove,
-    },
-
-    Remove {
-        #[command(flatten)]
-        params: EnvParamsConfigAddRemove,
-    }
 }

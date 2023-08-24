@@ -2,6 +2,7 @@ pub mod config;
 pub mod util;
 pub mod env;
 pub mod pkg;
+pub mod system_config;
 
 use clap::{Parser, Subcommand};
 

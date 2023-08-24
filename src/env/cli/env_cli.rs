@@ -1,7 +1,6 @@
 use crate::env::cli::env_cli_command::EnvCliCommand;
 use crate::env::env::Env;
-
-use super::env_cli_command::EnvConfigCliCommand;
+use crate::system_config::cli::system_config_cli_command::SystemConfigCliCommand;
 
 pub struct EnvCli {}
 
@@ -25,13 +24,13 @@ impl EnvCli {
             },
             EnvCliCommand::Config { config_command } => {
                 match config_command {
-                    EnvConfigCliCommand::List { params } => {
+                    SystemConfigCliCommand::List { params } => {
                         Env::config_list(params);
                     },
-                    EnvConfigCliCommand::Add { params } => {
+                    SystemConfigCliCommand::Add { params } => {
                         Env::config_add(params);
                     },
-                    EnvConfigCliCommand::Remove { params } => {
+                    SystemConfigCliCommand::Remove { params } => {
                         Env::config_remove(params);
                     }
                 }
