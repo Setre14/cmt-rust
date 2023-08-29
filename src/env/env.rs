@@ -63,7 +63,7 @@ impl Env {
         } else {
             let system_config = SystemConfig::get_system_config();
 
-            for config in system_config.env_config.configs {
+            for config in system_config.env_config.link_config.configs {
                 env_configs.push(Self::get_env_config(&Some(config)));
             }
         }
@@ -85,7 +85,7 @@ impl Env {
             Some(conf) => conf.clone(),
             None => {
                 let system_config = SystemConfig::get_system_config();
-                system_config.env_config.main_config.clone()
+                system_config.env_config.link_config.main_config.clone()
             },
         };
 
@@ -98,7 +98,7 @@ impl Env {
         base_config::save_config(&system_config);
 
         let mut env_paths = BTreeSet::new();
-        for env_config in system_config.env_config.configs {
+        for env_config in system_config.env_config.link_config.configs {
             let config = EnvConfig::get_env_config(&env_config);
             env_paths.extend(config.get_paths());
         }
@@ -113,7 +113,7 @@ impl Env {
         let system_config = SystemConfig::get_system_config();
 
         let mut env_paths = BTreeSet::new();
-        for env_config in system_config.env_config.configs {
+        for env_config in system_config.env_config.link_config.configs {
             let config = EnvConfig::get_env_config(&env_config);
             env_paths.extend(config.get_paths());
         }

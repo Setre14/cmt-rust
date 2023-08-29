@@ -36,7 +36,7 @@ impl Pkg {
         pkg_config.set_packages(&pkgm, &packages);
         base_config::save_config(&pkg_config);
 
-        let pkg_configs = SystemConfig::get_system_config().package_config.configs;
+        let pkg_configs = SystemConfig::get_system_config().package_config.link_config.configs;
 
         let mut remove = true;
         for pkg_conf in pkg_configs {

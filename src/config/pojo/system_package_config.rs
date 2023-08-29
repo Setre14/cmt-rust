@@ -4,19 +4,18 @@ use serde::{Serialize, Deserialize};
 
 use crate::util::exec::Exec;
 
+use super::link_config::LinkConfig;
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SystemPackageConfig {
-    #[serde(default = "SystemPackageConfig::get_default_package_config")]
-    pub main_config: String,
-    #[serde(default = "SystemPackageConfig::get_default_package_configs")]
-    pub configs: BTreeSet<String>,
+    #[serde(default, flatten)]
+    pub link_config: LinkConfig,
 }
 
 impl Default for SystemPackageConfig {
     fn default() -> Self { 
         SystemPackageConfig {
-            main_config: SystemPackageConfig::get_default_package_config(),
-            configs: SystemPackageConfig::get_default_package_configs(),
+            link_config: LinkConfig { ..Default::default() },
         }
     }
 }

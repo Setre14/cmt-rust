@@ -4,12 +4,12 @@ use serde::{Serialize, Deserialize};
 
 use crate::util::exec::Exec;
 
+use super::link_config::LinkConfig;
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SystemEnvConfig {
-    #[serde(default = "SystemEnvConfig::get_default_env_config")]
-    pub main_config: String,
-    #[serde(default = "SystemEnvConfig::get_default_env_configs")]
-    pub configs: BTreeSet<String>,
+    #[serde(default, flatten)]
+    pub link_config: LinkConfig,
     #[serde(default)]
     pub template_values: String,
 }
@@ -17,8 +17,7 @@ pub struct SystemEnvConfig {
 impl Default for SystemEnvConfig {
     fn default() -> Self { 
         SystemEnvConfig {
-            main_config: Self::get_default_env_config(),
-            configs: Self::get_default_env_configs(),
+            link_config: LinkConfig { ..Default::default() },
             template_values: Self::get_default_template_values(),
         }
     }
@@ -27,15 +26,5 @@ impl Default for SystemEnvConfig {
 impl SystemEnvConfig {
     pub fn get_default_template_values() -> String {
         format!("values-{}.json", Exec::get_hostname())
-    }
-
-    pub fn get_default_env_config() -> String {
-        return format!("env-{}", Exec::get_hostname());
-    }
-
-    pub fn get_default_env_configs() -> BTreeSet<String> {
-        let mut configs: BTreeSet<String> = BTreeSet::new();
-        configs.insert(Self::get_default_env_config());
-        configs
     }
 }

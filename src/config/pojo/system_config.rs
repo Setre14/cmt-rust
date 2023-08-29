@@ -45,20 +45,14 @@ impl SystemConfig {
         SystemConfig::get_config(Some(settings.system_config))
     }
 
-    pub fn get_default_env_config() -> BTreeSet<String> {
-        let mut env_configs: BTreeSet<String> = BTreeSet::new();
-        env_configs.insert("env".to_string());
-        env_configs
-    }
-
     pub fn list(params: &SystemConfigParamList) {
         Config::auto_pull();
         let configs = match params.all {
             true => EnvConfig::get_configs(),
             false => {
                 let system_config = SystemConfig::get_system_config();
-                let mut configs = system_config.env_config.configs.clone();
-                configs.insert(system_config.env_config.main_config.clone());
+                let mut configs = system_config.env_config.link_config.configs.clone();
+                configs.insert(system_config.env_config.link_config.main_config.clone());
                 configs            
             }
             
@@ -80,9 +74,9 @@ impl SystemConfig {
         }
 
         let mut system_config = SystemConfig::get_system_config();
-        let mut configs = system_config.env_config.configs.clone();
+        let mut configs = system_config.env_config.link_config.configs.clone();
         configs.insert(params.config.clone());
-        system_config.env_config.configs = configs;
+        system_config.env_config.link_config.configs = configs;
         base_config::save_config(&system_config);
         Config::auto_commit_push(Some(format!("Add env config: '{}'", &params.config)));
     }
@@ -90,7 +84,7 @@ impl SystemConfig {
     pub fn remove(params: &SystemConfigParamAddRemove) {
         Config::auto_pull();
         let mut system_config = SystemConfig::get_system_config();
-        system_config.env_config.configs.remove(&params.config);
+        system_config.env_config.link_config.configs.remove(&params.config);
         base_config::save_config(&system_config);
         Config::auto_commit_push(Some(format!("Remove env config: '{}'", &params.config)));
     }

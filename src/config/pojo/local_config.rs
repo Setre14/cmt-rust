@@ -55,7 +55,7 @@ impl BaseConfig for LocalConfig {
 
 impl LocalConfig {
     pub fn get_default_debug_level() -> u8 {
-        0
+        1
     }
 
     pub fn get_default_git_auto_sync() -> bool {
