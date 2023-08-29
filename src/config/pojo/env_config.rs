@@ -16,7 +16,7 @@ pub struct EnvConfig {
 
 impl BaseConfig for EnvConfig {
     fn get_default_config_file_name() -> String {
-        "env/env".to_string()
+        "env".to_string()
 
     }
 
@@ -38,7 +38,7 @@ impl BaseConfig for EnvConfig {
 
 impl EnvConfig {
     pub fn get_env_config(config: &str) -> EnvConfig {
-        EnvConfig::get_config(Some(format!("env/{}", config)))
+        EnvConfig::get_config(Some(config.to_string()))
     }
 
     pub fn config_exists(config: &str) -> bool {
