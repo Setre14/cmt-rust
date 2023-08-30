@@ -10,6 +10,8 @@ use crate::util::confy_util::ConfyUtil;
 use crate::util::exec::Exec;
 use crate::util::path_util::PathUtil;
 
+use super::cli::config_params_open::ConfigParamsOpen;
+
 pub struct Config {}
 
 impl Config {
@@ -106,12 +108,20 @@ impl Config {
         }
     }
 
-    pub fn open_in_editor(editor: &str, open_git_config: &bool) {
-            let path = match open_git_config {
+    pub fn open_in_editor(params: &ConfigParamsOpen) {
+            let editor = match &params.editor {
+                Some(e) => e.to_string(),
+                None => {
+                    let local_config = LocalConfig::get_config(None);
+                    local_config.editor
+                },
+            };
+
+            let path = match &params.git_config {
                 true => ConfyUtil::get_git_configuration_dir(),
                 false => ConfyUtil::get_root_configuration_dir(),
             };
             let path_string = PathUtil::to_string(&path);
-            Exec::status(&CommandLine{command: editor.to_string(), args: [path_string].to_vec()}, None);
+            Exec::status(&CommandLine{command: editor.clone(), args: [path_string].to_vec()}, None);
     }
 }

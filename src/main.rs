@@ -6,9 +6,8 @@ pub mod system_config;
 
 use clap::{Parser, Subcommand};
 
-use config::cli::config_params_init::ConfigParamsInit;
-use config::cli::config_params_update::ConfigParamsUpdate;
-use config::config::Config;
+use config::cli::config_cli::ConfigCli;
+use config::cli::config_cli_command::ConfigCliCommand;
 use env::cli::env_cli::EnvCli;
 use env::cli::env_cli_command::EnvCliCommand;
 use config::pojo::local_config::LocalConfig;
@@ -33,23 +32,10 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Init local config and clone git config
-    Init {
-        #[command(flatten)]
-        params: ConfigParamsInit,
-    },
-
-    /// Update local config
-    Update {
-        #[command(flatten)]
-        params: ConfigParamsUpdate,
-    },
-
-    /// Open config in editor
-    Open {
-        /// Open git config
-        #[arg(short = 'g', long)]
-        open_git_config: bool,
+    /// Interact with local config
+    Config {
+        #[command(subcommand)]
+        command: ConfigCliCommand,
     },
 
     /// Manipulate env files
@@ -81,14 +67,8 @@ fn main() {
         .unwrap();
     
     match &cli.command {
-        Some(Command::Init { params }) => {
-            Config::init(params);
-        },
-        Some(Command::Update { params }) => {
-            Config::update(params);
-        },
-        Some(Command::Open { open_git_config }) => {
-            Config::open_in_editor(&settings.editor, open_git_config)
+        Some(Command::Config { command }) => {
+            ConfigCli::handle_command(command);
         },
         Some(Command::Env { command }) => {
             EnvCli::handle_command(command)
