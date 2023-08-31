@@ -1,11 +1,11 @@
-use crate::pkg::dnf::dnf::Dnf;
+use crate::pkg::dnf::{dnf::Dnf, dnf_config_manager::DnfConfigManager};
 
 use super::dnf_cli_command::DnfCliCommand;
 
 pub struct DnfCli {}
 
 impl DnfCli {
-    pub fn handle_command(command: &DnfCliCommand) {
+    pub fn handle_command(command: &DnfCliCommand, config: &Option<String>) {
         match command {
             DnfCliCommand::Install { params } => {
                 Dnf::install(params);
@@ -15,6 +15,9 @@ impl DnfCli {
             },
             DnfCliCommand::Update {} => {
                 Dnf::update();
+            },
+            DnfCliCommand::ConfigManager { params } => {
+                DnfConfigManager::handle_command(params, config);
             },
         }
     }

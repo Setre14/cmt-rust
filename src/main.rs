@@ -19,8 +19,9 @@ use pkg::cli::pkg_cli_command::PkgCliCommand;
 #[command(author, version, about, long_about = None)]
 struct Cli {
     /// Silence all output
-    #[arg(short, long)]
+    #[arg(short, long, global = true)]
     quiet: bool,
+
     /// Verbose mode (-v, -vv, -vvv, etc)
     #[arg(short, long, action = clap::ArgAction::Count, global = true)]
     verbose: u8,
@@ -42,12 +43,20 @@ enum Command {
     Env {
         #[command(subcommand)]
         command: EnvCliCommand,
+
+        /// Config to use
+        #[arg(short, long, global = true)]
+        config: Option<String>,
     },
 
-    /// Interact with dnf package manager
+    /// Interact with package manager
     Pkg {
         #[command(subcommand)]
         command: PkgCliCommand,
+
+        /// Config to use
+        #[arg(short, long, global = true)]
+        config: Option<String>,
     }
 }
 
@@ -70,11 +79,11 @@ fn main() {
         Some(Command::Config { command }) => {
             ConfigCli::handle_command(command);
         },
-        Some(Command::Env { command }) => {
-            EnvCli::handle_command(command)
+        Some(Command::Env { command, config }) => {
+            EnvCli::handle_command(command, config)
         },
-        Some(Command::Pkg { command }) => {
-            PkgCli::handle_command(command)
+        Some(Command::Pkg { command, config }) => {
+            PkgCli::handle_command(command, config)
         },
         None => {} 
     }

@@ -6,16 +6,16 @@ use crate::system_config::cli::system_config_cli_command::SystemConfigCliCommand
 pub struct EnvCli {}
 
 impl EnvCli {
-    pub fn handle_command(command: &EnvCliCommand) {
+    pub fn handle_command(command: &EnvCliCommand, config: &Option<String>) {
         match command {
             EnvCliCommand::Add { params } => {
-                Env::add(params);
+                Env::add(params, config);
             },
             EnvCliCommand::Remove { params } => {
-                Env::remove(params);
+                Env::remove(params, config);
             },
-            EnvCliCommand::List { params } => {
-                Env::list(params);
+            EnvCliCommand::List {} => {
+                Env::list(config);
             },
             EnvCliCommand::Apply {} => {
                 Env::apply();

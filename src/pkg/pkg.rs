@@ -8,7 +8,7 @@ pub struct Pkg {}
 impl Pkg {
     pub fn install(pkgm: Pkgm, command_line: &CommandLine, params: &PkgParamsInstallRemove) {
         Config::auto_pull();
-        let package = params.package.clone().unwrap();
+        let package = params.package.clone();
 
         let mut pkg_config = PkgConfig::get_pkg_config(&params.pkg_config);
         let mut packages = pkg_config.get_packages(&pkgm);
@@ -27,7 +27,7 @@ impl Pkg {
 
     pub fn remove(pkgm: Pkgm, command_line: &CommandLine, params: &PkgParamsInstallRemove) {
         Config::auto_pull();
-        let package = params.package.clone().unwrap();
+        let package = params.package.clone();
 
         let mut pkg_config: PkgConfig = PkgConfig::get_pkg_config(&params.pkg_config);
         let mut packages = pkg_config.get_packages(&pkgm);

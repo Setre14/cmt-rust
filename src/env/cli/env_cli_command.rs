@@ -1,7 +1,6 @@
 use clap::Subcommand;
 
 use crate::env::cli::env_params_add_remove::EnvParamsAddRemove;
-use crate::env::cli::env_params_list::EnvParamsList;
 use crate::system_config::cli::system_config_cli_command::SystemConfigCliCommand;
 
 #[derive(Subcommand)]
@@ -13,10 +12,7 @@ pub enum EnvCliCommand {
     },
 
     /// List paths set in env configs
-    List {
-        #[command(flatten)]
-        params: EnvParamsList,
-    },
+    List { },
 
     /// Copies all env defined in the user config to the system
     Apply {
@@ -29,8 +25,7 @@ pub enum EnvCliCommand {
     },
 
     /// Updates all files defined in the user config from the system to the config dir
-    Sync {
-    },
+    Sync { },
 
 
     /// List, add and remove env config files

@@ -8,16 +8,14 @@ use crate::env::env_copy::EnvCopy;
 use crate::env::env_path::EnvPath;
 use crate::env::cli::env_params_add_remove::EnvParamsAddRemove;
 
-use super::cli::env_params_list::EnvParamsList;
-
 pub struct Env {}
 
 impl Env {
-    pub fn add(params: &EnvParamsAddRemove) {
+    pub fn add(params: &EnvParamsAddRemove, config: &Option<String>) {
         Config::auto_pull();
         let env_path = EnvPath::from_local(&params.path);
 
-        let mut env_config = Self::get_env_config(&params.env_config);
+        let mut env_config = Self::get_env_config(config);
 
         EnvCopy::copy_to_remote(&env_path);
 
@@ -28,11 +26,11 @@ impl Env {
         Config::auto_commit_push(Some(format!("Add path: '{}'", env_path.path)));
     }
 
-    pub fn remove(params: &EnvParamsAddRemove) {
+    pub fn remove(params: &EnvParamsAddRemove, config: &Option<String>) {
         Config::auto_pull();
         let env_path = EnvPath::from_local(&params.path);
 
-        let mut env_config = Self::get_env_config(&params.env_config);
+        let mut env_config = Self::get_env_config(config);
         env_config.remove_path(&env_path);
         base_config::save_config(&env_config);
 
@@ -55,11 +53,11 @@ impl Env {
         Config::auto_commit_push(Some(format!("Remove path: '{}'", env_path.path)));
     }
 
-    pub fn list(params: &EnvParamsList) {
+    pub fn list(config: &Option<String>) {
         let mut env_configs = Vec::new();
 
-        if params.config.is_some() {
-            env_configs.push(Self::get_env_config(&params.config));
+        if config.is_some() {
+            env_configs.push(Self::get_env_config(config));
         } else {
             let system_config = SystemConfig::get_system_config();
 

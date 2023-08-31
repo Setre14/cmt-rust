@@ -9,6 +9,8 @@ pub struct DnfConfig {
     #[serde(skip_serializing, default)]
     pub file_name: String,
     #[serde(default)]
+    pub repos: BTreeSet<String>,
+    #[serde(default)]
     pub packages: BTreeSet<String>,
 }
 

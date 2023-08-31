@@ -15,7 +15,7 @@ impl Pacman {
         if sync_params.refresh {
             command.push("-y");
         }
-        let package = pkg_params.package.clone().unwrap_or("".to_string());
+        let package = pkg_params.package.to_string();
         if !package.is_empty() {
             command.push(&package);
 
@@ -35,12 +35,7 @@ impl Pacman {
     }
 
     pub fn remove(pkg_params: &PkgParamsInstallRemove, shared_params: &PacmanParamsShared) {
-        if pkg_params.package.is_none() {
-            log::error!("Package must be set for remove");
-            std::process::exit(1);
-        }
-
-        let package = pkg_params.package.clone().unwrap();
+        let package = pkg_params.package.to_string();
 
         let mut command = vec!["pacman", "-R", &package];
         if shared_params.noconfirm {

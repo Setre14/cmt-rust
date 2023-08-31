@@ -5,10 +5,10 @@ use super::pkg_cli_command::PkgCliCommand;
 pub struct PkgCli {}
 
 impl PkgCli {
-    pub fn handle_command(command: &PkgCliCommand) {
+    pub fn handle_command(command: &PkgCliCommand, config: &Option<String>) {
         match command {
             PkgCliCommand::Dnf { command } => {
-                DnfCli::handle_command(command);
+                DnfCli::handle_command(command, config);
             },
             PkgCliCommand::Pacman { params } => {
                 PacmanCli::handle_command(params);
